@@ -31,11 +31,11 @@ class MyClient(discord.Client):
                 await message.reply("Oh, you’re from New Jersey? What exit?")
             elif random.randrange(chance2) == 0:
                 await message.reply("I̸̛̛͉͈͔̖̯̤̔̿̄͐̀͊̄̀ ̶̲͓͍͕̝͑́̒f̵̨͇͚̦̯̭̪̍͜ͅu̵̺̖̲̤̘̥͔̓c̷̢͍͒̿̒̔͑̇͠ͅk̷̨̠͓̻̠̣͕̯̩̅̌̔̆̅͌͘͝i̷̬̟̖̬̩͎̞̍ṇ̷̛͓̙̬͉̙͍̍̀̈́̀̈́̔̊͠ͅg̸̳̙̜͎̔̓̑͊͊͋̕͜͠ͅ ̸͔͚̝̳̅͛̉̓̔̆͝h̶̨̭̓̊̀̌͊̆͗̀̈́̇a̸̢̳̓͋t̶̢̛̝̫̺̭̫͍̮͍͈̍̊̈́̒̎̇̆͊̄e̸̡͉̳̲̲͓̾̅͐̈́́͗͗̓͜ͅ ̶̧̗̖͔̲̝͍͇̼͒̏̽͗̈̅̎̕n̸̗̫͙̞͗͒̆̇͂̅͆͜ḙ̸̻͕̈͆̋̉̾͌w̵̢̬̹̗̟͈̞͉͎͐̄ͅ ̸̢͉̪͍̹̼̮͚͔̐̉̌͂͂̃̚͜͠͠j̴͖͖̝͛̐̎̅̎̀̑̇͜e̴̩̦̮͙̽̓͂͐̏͝r̸͙̝̙̣͚͕̫̰̓̓̒̉͗̒ͅš̵̪̫͙͔̩̊͊̈̽̿́͋̌̽ë̸͖̹̥́̿̿̒͌̐̈́͝ỹ̷̭͍̿̈͝")
-            elif random.randrange(chance2) == 0:
+            elif random.randrange(chance2) == 1:
                 await message.reply("https://i.redd.it/sh4geimk2jv51.jpg")
-            elif random.randrange(chance2) == 0:
+            elif random.randrange(chance2) == 2:
                 await message.reply("https://www.youtube.com/watch?v=LTQpFmG2VJk")
-            elif random.randrange(chance2) == 0:
+            elif random.randrange(chance2) == 3:
                 await message.reply("https://www.youtube.com/watch?v=l_7XhzCc0-0")
             else:
                 await message.reply("I fucking hate new jersey 😡😡😡😡😡😡😡😡😡")
