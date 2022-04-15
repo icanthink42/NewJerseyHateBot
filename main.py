@@ -1,6 +1,9 @@
 import os
 import random
 from time import sleep
+import pickle
+import user
+import config
 
 import discord
 from discord.ext.tasks import loop
@@ -14,31 +17,39 @@ banned_channels = [925208759268147326]
 class MyClient(discord.Client):
     async def on_ready(self):
         print('Logged on as {0}!'.format(self.user))
+        user_files = os.listdir(config.user_save_dir)
+        for user_i in user_files:
+            user_file = open(config.user_save_dir + "/" + user_i, "rb")
+            user.users[int(user_i)] = pickle.load(user_file)
         client.join_vc.start()
 
     async def on_message(self, message):
         if message.author.id == 964331688832417802 or  message.channel.id in banned_channels or message.author.bot:
             return
-        if "newjersey" in message.content.lower().replace(" ","") and "good" in message.content:
-            if random.randrange(chance2) == 0:
-                await message.reply(
-                    "⚠️ **This Claim About New Jersey Is Disputed.**\nHelp keep Discord a place for reliable info. Find out more about why New Jersey is bad before posting.")
+        if "newjersey" in message.content.lower().replace(" ",""):
+            c_user = user.get_user(message.author.id)
+            c_user.new_jersey_count += 1
+            c_user.save()
+            if "good" in message.content:
+                if random.randrange(chance2) == 0:
+                    await message.reply(
+                        "⚠️ **This Claim About New Jersey Is Disputed.**\nHelp keep Discord a place for reliable info. Find out more about why New Jersey is bad before posting.")
+                else:
+                    await message.reply(
+                        "Don't use \"new jersey\" and \"good\" in the same sentence! Misinformation is a problem!")
             else:
-                await message.reply(
-                    "Don't use \"new jersey\" and \"good\" in the same sentence! Misinformation is a problem!")
-        elif "newjersey" in message.content.lower().replace(" ",""):
-            if message.channel.id == 925208759268147327: #this is the introductions channel
-                await message.reply("Oh, you’re from New Jersey? What exit?")
-            elif random.randrange(chance2) == 0:
-                await message.reply("I̸̛̛͉͈͔̖̯̤̔̿̄͐̀͊̄̀ ̶̲͓͍͕̝͑́̒f̵̨͇͚̦̯̭̪̍͜ͅu̵̺̖̲̤̘̥͔̓c̷̢͍͒̿̒̔͑̇͠ͅk̷̨̠͓̻̠̣͕̯̩̅̌̔̆̅͌͘͝i̷̬̟̖̬̩͎̞̍ṇ̷̛͓̙̬͉̙͍̍̀̈́̀̈́̔̊͠ͅg̸̳̙̜͎̔̓̑͊͊͋̕͜͠ͅ ̸͔͚̝̳̅͛̉̓̔̆͝h̶̨̭̓̊̀̌͊̆͗̀̈́̇a̸̢̳̓͋t̶̢̛̝̫̺̭̫͍̮͍͈̍̊̈́̒̎̇̆͊̄e̸̡͉̳̲̲͓̾̅͐̈́́͗͗̓͜ͅ ̶̧̗̖͔̲̝͍͇̼͒̏̽͗̈̅̎̕n̸̗̫͙̞͗͒̆̇͂̅͆͜ḙ̸̻͕̈͆̋̉̾͌w̵̢̬̹̗̟͈̞͉͎͐̄ͅ ̸̢͉̪͍̹̼̮͚͔̐̉̌͂͂̃̚͜͠͠j̴͖͖̝͛̐̎̅̎̀̑̇͜e̴̩̦̮͙̽̓͂͐̏͝r̸͙̝̙̣͚͕̫̰̓̓̒̉͗̒ͅš̵̪̫͙͔̩̊͊̈̽̿́͋̌̽ë̸͖̹̥́̿̿̒͌̐̈́͝ỹ̷̭͍̿̈͝")
-            elif random.randrange(chance2) == 1:
-                await message.reply("https://i.redd.it/sh4geimk2jv51.jpg")
-            elif random.randrange(chance2) == 2:
-                await message.reply("https://www.youtube.com/watch?v=LTQpFmG2VJk")
-            elif random.randrange(chance2) == 3:
-                await message.reply("https://www.youtube.com/watch?v=l_7XhzCc0-0")
-            else:
-                await message.reply("I fucking hate new jersey 😡😡😡😡😡😡😡😡😡")
+                if message.channel.id == 925208759268147327: #this is the introductions channel
+                    await message.reply("Oh, you’re from New Jersey? What exit?")
+                elif random.randrange(chance2) == 0:
+                    await message.reply("I̸̛̛͉͈͔̖̯̤̔̿̄͐̀͊̄̀ ̶̲͓͍͕̝͑́̒f̵̨͇͚̦̯̭̪̍͜ͅu̵̺̖̲̤̘̥͔̓c̷̢͍͒̿̒̔͑̇͠ͅk̷̨̠͓̻̠̣͕̯̩̅̌̔̆̅͌͘͝i̷̬̟̖̬̩͎̞̍ṇ̷̛͓̙̬͉̙͍̍̀̈́̀̈́̔̊͠ͅg̸̳̙̜͎̔̓̑͊͊͋̕͜͠ͅ ̸͔͚̝̳̅͛̉̓̔̆͝h̶̨̭̓̊̀̌͊̆͗̀̈́̇a̸̢̳̓͋t̶̢̛̝̫̺̭̫͍̮͍͈̍̊̈́̒̎̇̆͊̄e̸̡͉̳̲̲͓̾̅͐̈́́͗͗̓͜ͅ ̶̧̗̖͔̲̝͍͇̼͒̏̽͗̈̅̎̕n̸̗̫͙̞͗͒̆̇͂̅͆͜ḙ̸̻͕̈͆̋̉̾͌w̵̢̬̹̗̟͈̞͉͎͐̄ͅ ̸̢͉̪͍̹̼̮͚͔̐̉̌͂͂̃̚͜͠͠j̴͖͖̝͛̐̎̅̎̀̑̇͜e̴̩̦̮͙̽̓͂͐̏͝r̸͙̝̙̣͚͕̫̰̓̓̒̉͗̒ͅš̵̪̫͙͔̩̊͊̈̽̿́͋̌̽ë̸͖̹̥́̿̿̒͌̐̈́͝ỹ̷̭͍̿̈͝")
+                elif random.randrange(chance2) == 1:
+                    await message.reply("https://i.redd.it/sh4geimk2jv51.jpg")
+                elif random.randrange(chance2) == 2:
+                    await message.reply("https://www.youtube.com/watch?v=LTQpFmG2VJk")
+                elif random.randrange(chance2) == 3:
+                    await message.reply("https://www.youtube.com/watch?v=l_7XhzCc0-0")
+                else:
+                    await message.reply("I fucking hate new jersey 😡😡😡😡😡😡😡😡😡")
         if "im " in message.content.lower() or "i'm " in message.content.lower():
             if "im " in message.content.lower():
                 index = message.content.lower().index("im") + 3
