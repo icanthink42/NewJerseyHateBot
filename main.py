@@ -33,7 +33,7 @@ class MyClient(discord.Client):
         if random.randrange(chance) == 0:
             await message.channel.send("https://images-ext-1.discordapp.net/external/2kxuirHSrAbZ9wYvmpJDF9XVoRC0cCai_5fLrhdbnf4/%3Fc%3DVjFfZGlzY29yZA/https/media.tenor.com/ZWNF4V4ftdAAAAPo/new-jersey-walter-white-amogus.mp4")
 
-    @loop(seconds=300)
+    @loop(seconds=3600)
     async def join_vc(self):
         audio_files = os.listdir("audio_files")
         vc_channel = await client.fetch_channel(vc_channel_id)  # This may get me r8 limited. fix if it does
