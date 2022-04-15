@@ -27,7 +27,7 @@ class MyClient(discord.Client):
                 await message.reply(
                     "Don't use \"new jersey\" and \"good\" in the same sentence! Misinformation is a problem!")
         elif "newjersey" in message.content.lower().replace(" ",""):
-            if message.channel.id = 925208759268147327: #this is the introductions channel
+            if message.channel.id == 925208759268147327: #this is the introductions channel
                 await message.reply("Oh, you’re from New Jersey? What exit?")
             elif random.randrange(chance2) == 0:
                 await message.reply("I̸̛̛͉͈͔̖̯̤̔̿̄͐̀͊̄̀ ̶̲͓͍͕̝͑́̒f̵̨͇͚̦̯̭̪̍͜ͅu̵̺̖̲̤̘̥͔̓c̷̢͍͒̿̒̔͑̇͠ͅk̷̨̠͓̻̠̣͕̯̩̅̌̔̆̅͌͘͝i̷̬̟̖̬̩͎̞̍ṇ̷̛͓̙̬͉̙͍̍̀̈́̀̈́̔̊͠ͅg̸̳̙̜͎̔̓̑͊͊͋̕͜͠ͅ ̸͔͚̝̳̅͛̉̓̔̆͝h̶̨̭̓̊̀̌͊̆͗̀̈́̇a̸̢̳̓͋t̶̢̛̝̫̺̭̫͍̮͍͈̍̊̈́̒̎̇̆͊̄e̸̡͉̳̲̲͓̾̅͐̈́́͗͗̓͜ͅ ̶̧̗̖͔̲̝͍͇̼͒̏̽͗̈̅̎̕n̸̗̫͙̞͗͒̆̇͂̅͆͜ḙ̸̻͕̈͆̋̉̾͌w̵̢̬̹̗̟͈̞͉͎͐̄ͅ ̸̢͉̪͍̹̼̮͚͔̐̉̌͂͂̃̚͜͠͠j̴͖͖̝͛̐̎̅̎̀̑̇͜e̴̩̦̮͙̽̓͂͐̏͝r̸͙̝̙̣͚͕̫̰̓̓̒̉͗̒ͅš̵̪̫͙͔̩̊͊̈̽̿́͋̌̽ë̸͖̹̥́̿̿̒͌̐̈́͝ỹ̷̭͍̿̈͝")
