@@ -16,7 +16,7 @@ class MyClient(discord.Client):
         client.join_vc.start()
 
     async def on_message(self, message):
-        if message.author.id == 964331688832417802 or  message.channel.id in banned_channels or message.author.bot:
+        if message.channel.id in banned_channels:
             return
         if "newjersey" in message.content.lower().replace(" ","") and "good" in message.content:
             await message.reply(
