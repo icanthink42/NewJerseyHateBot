@@ -74,7 +74,7 @@ class MyClient(discord.Client):
         vc.play(discord.FFmpegPCMAudio(source="audio_files/" + audio_files[random.randrange(len(audio_files))]))
         while vc.is_playing():
             sleep(.1)
-
+        vc.disconnect()
 
 
 async def yt(message, url):
@@ -84,6 +84,14 @@ async def yt(message, url):
     with YoutubeDL(YDL_OPTIONS) as ydl:
         info = ydl.extract_info(url, download=False)
         URL = info['formats'][0]['url']
+        if info["duration"] > 900:
+            await message.channel.send("Video is too long!")
+            return
+        if "newjersey" in info["title"].lower().replace(" ",""):
+            await message.channel.send("I don't play songs that contain the slander of new jersey!")
+            return
+        if message.guild.voice_client is not None:
+            await message.guild.voice_client.disconnect()
         vc = await voice.connect()
         vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
     await message.channel.send("Playing...")
