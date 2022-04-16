@@ -7,6 +7,7 @@ import config
 
 import discord
 from discord.ext.tasks import loop
+from youtube_dl import YoutubeDL
 
 f = open("token", "r")
 
@@ -17,7 +18,7 @@ class MyClient(discord.Client):
         for user_i in user_files:
             user_file = open(config.user_save_dir + "/" + user_i, "rb")
             user.users[int(user_i)] = pickle.load(user_file)
-        client.join_vc.start()
+        # client.join_vc.start()
     async def on_message(self, message):
         if message.author.id == 964331688832417802 or  message.channel.id in config.banned_channels or message.author.bot:
             return
@@ -60,6 +61,10 @@ class MyClient(discord.Client):
                     "Hi " + message.content[index:] + ", I'm dad!")  # warning doesn't matter and i dont cate enough to fix
         if random.randrange(config.chance) == 0:
             await message.channel.send("https://images-ext-1.discordapp.net/external/2kxuirHSrAbZ9wYvmpJDF9XVoRC0cCai_5fLrhdbnf4/%3Fc%3DVjFfZGlzY29yZA/https/media.tenor.com/ZWNF4V4ftdAAAAPo/new-jersey-walter-white-amogus.mp4")
+        if message.content[0] == ")":
+            url = message.content[1:]
+            print(url)
+            await yt(message, url)
 
     @loop(seconds=3600)
     async def join_vc(self):
@@ -69,8 +74,19 @@ class MyClient(discord.Client):
         vc.play(discord.FFmpegPCMAudio(source="audio_files/" + audio_files[random.randrange(len(audio_files))]))
         while vc.is_playing():
             sleep(.1)
-        await vc.disconnect()
 
+
+
+async def yt(message, url):
+    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist':'True'}
+    FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+    voice = message.author.voice.channel
+    with YoutubeDL(YDL_OPTIONS) as ydl:
+        info = ydl.extract_info(url, download=False)
+        URL = info['formats'][0]['url']
+        vc = await voice.connect()
+        vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+    await message.channel.send("Playing...")
 
 client = MyClient()
 client.run(f.read())
