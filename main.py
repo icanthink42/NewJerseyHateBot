@@ -72,8 +72,9 @@ class MyClient(discord.Client):
         vc_channel = await client.fetch_channel(config.vc_channel_id)  # This may get me r8 limited. fix if it does
         vc = await vc_channel.connect()
         vc.play(discord.FFmpegPCMAudio(source="audio_files/" + audio_files[random.randrange(len(audio_files))]))
+        guild = await client.fetch_guild(925208758370590820)
         if message.guild.voice_client is not None:
-            await message.guild.voice_client.disconnect()
+            await guild.voice_client.disconnect()
         while vc.is_playing():
             sleep(.1)
 
@@ -95,7 +96,7 @@ async def yt(message, url):
             await message.guild.voice_client.disconnect()
         vc = await voice.connect()
         vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-    await message.channel.send("Playing...")
+    await message.channel.send("Playing " + info["title"] + "...")
 
 client = MyClient()
 client.run(f.read())
