@@ -94,6 +94,9 @@ async def yt(message, url):
             return
         if message.guild.voice_client is not None:
             await message.guild.voice_client.disconnect()
+        if "static" in info["title"].lower():
+            await message.channel.send("bad toby")
+            return
         vc = await voice.connect()
         vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
     await message.channel.send("Playing " + info["title"] + "...")
