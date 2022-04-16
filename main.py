@@ -18,7 +18,7 @@ class MyClient(discord.Client):
         for user_i in user_files:
             user_file = open(config.user_save_dir + "/" + user_i, "rb")
             user.users[int(user_i)] = pickle.load(user_file)
-        # client.join_vc.start()
+        client.join_vc.start()
     async def on_message(self, message):
         if message.author.id == 964331688832417802 or  message.channel.id in config.banned_channels or message.author.bot:
             return
@@ -72,9 +72,10 @@ class MyClient(discord.Client):
         vc_channel = await client.fetch_channel(config.vc_channel_id)  # This may get me r8 limited. fix if it does
         vc = await vc_channel.connect()
         vc.play(discord.FFmpegPCMAudio(source="audio_files/" + audio_files[random.randrange(len(audio_files))]))
+        if message.guild.voice_client is not None:
+            await message.guild.voice_client.disconnect()
         while vc.is_playing():
             sleep(.1)
-        vc.disconnect()
 
 
 async def yt(message, url):
