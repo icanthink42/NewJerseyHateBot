@@ -27,7 +27,7 @@ class MyClient(discord.Client):
             c_user.save()
             if c_user.new_jersey_count % 100 == 0:
                 spam_channel = await client.fetch_channel(config.spam_channel_id)
-                spam_channel.send("<@" + str(message.author.id) + "> has said new jersey " + str(c_user.new_jersey_count) + " times!")
+                await spam_channel.send("<@" + str(message.author.id) + "> has said new jersey " + str(c_user.new_jersey_count) + " times!")
             if "good" in message.content:
                 if random.randrange(config.chance2) == 0:
                     await message.reply(
