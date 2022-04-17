@@ -1,34 +1,85 @@
 import os
 import random
-from time import sleep
 import pickle
 import user
 import config
+from typing import List, Dict
+import asyncio
 
 import discord
-from discord.ext.tasks import loop
 from youtube_dl import YoutubeDL
 
-f = open("token", "r")
+tokenFile = open("token", "r")
+token = tokenFile.read()
+tokenFile.close()
 
-class MyClient(discord.Client):
+
+# Picks a random filename in a directory
+def randomFile(dir: str) -> str:
+    fileNames: List[str] = os.listdir(dir)
+    return f"{dir}/{random.choice(fileNames)}"
+
+
+# Picks a random string from a weighted selection
+def randomString(choices: Dict[str, int]) -> str:
+    totalWeight = 0
+    for value in choices.values():
+        totalWeight += value
+
+    selectedWeight = random.randrange(0, totalWeight)
+    passedWeight = 0
+    for key in choices:
+        passedWeight += choices[key]
+        if passedWeight > selectedWeight:
+            return key
+    raise RuntimeError("This should'nt be able to happen.")
+
+
+# Returns true if "new jersey" is in the string
+def containsNJ(text: str) -> bool:
+    return "newjersey" in text.lower().replace(" ", "")
+
+
+# Returns the index after "I'm" or "Im", or -1 if not found
+def containsIm(text: str) -> int:
+    # "Im"
+    index = text.lower().find("im ")
+    if index == 0 or (index > 0 and text[index - 1].isspace()):
+        return index + 3
+    # "I'm"
+    index = text.lower().find("i'm ")
+    if index == 0 or (index > 0 and text[index - 1].isspace()):
+        return index + 4
+    # Not found
+    return -1
+
+
+class AntiNJClient(discord.Client):
     async def on_ready(self):
-        print('Logged on as {0}!'.format(self.user))
+        print(f"Logged on as {self.user}!")
         user_files = os.listdir(config.user_save_dir)
         for user_i in user_files:
-            user_file = open(config.user_save_dir + "/" + user_i, "rb")
+            user_file = open(f"{config.user_save_dir}/{user_i}", "rb")
             user.users[int(user_i)] = pickle.load(user_file)
-        client.join_vc.start()
-    async def on_message(self, message):
-        if message.author.id == 964331688832417802 or  message.channel.id in config.banned_channels or message.author.bot:
+        await self.join_vc()
+
+    async def on_message(self, message: discord.Message):
+        if message.author.id == 964331688832417802 or message.channel.id in config.banned_channels or message.author.bot:
             return
-        if "newjersey" in message.content.lower().replace(" ",""):
-            c_user = user.get_user(message.author.id)
-            c_user.new_jersey_count += 1
-            c_user.save()
-            if c_user.new_jersey_count % 100 == 0:
-                spam_channel = await client.fetch_channel(config.spam_channel_id)
-                await spam_channel.send("<@" + str(message.author.id) + "> has said new jersey " + str(c_user.new_jersey_count) + " times!")
+        if message.content[0] == ")":
+            url = message.content[1:]
+            print(url)
+            await yt(message, url)
+            return
+        if containsNJ(message.content):
+            njcount = user.increment_user(message.author.id)
+            if njcount % 100 == 0:
+                try:
+                    spam_channel = await client.fetch_channel(config.spam_channel_id)
+                except:
+                    print("ERROR: Failed to fetch spam channel from discord")
+                else:
+                    await spam_channel.send(f"{message.author.mention} has said new jersey {njcount} times!")
             if "good" in message.content:
                 if random.randrange(config.chance2) == 0:
                     await message.reply(
@@ -37,70 +88,84 @@ class MyClient(discord.Client):
                     await message.reply(
                         "Don't use \"new jersey\" and \"good\" in the same sentence! Misinformation is a problem!")
             else:
-                if message.channel.id == 925208759268147327: #this is the introductions channel
+                if message.channel.id in config.introduction_channels:
                     await message.reply("Oh, you’re from New Jersey? What exit?")
-                elif random.randrange(config.chance2) == 0:
-                    await message.reply("I̸̛̛͉͈͔̖̯̤̔̿̄͐̀͊̄̀ ̶̲͓͍͕̝͑́̒f̵̨͇͚̦̯̭̪̍͜ͅu̵̺̖̲̤̘̥͔̓c̷̢͍͒̿̒̔͑̇͠ͅk̷̨̠͓̻̠̣͕̯̩̅̌̔̆̅͌͘͝i̷̬̟̖̬̩͎̞̍ṇ̷̛͓̙̬͉̙͍̍̀̈́̀̈́̔̊͠ͅg̸̳̙̜͎̔̓̑͊͊͋̕͜͠ͅ ̸͔͚̝̳̅͛̉̓̔̆͝h̶̨̭̓̊̀̌͊̆͗̀̈́̇a̸̢̳̓͋t̶̢̛̝̫̺̭̫͍̮͍͈̍̊̈́̒̎̇̆͊̄e̸̡͉̳̲̲͓̾̅͐̈́́͗͗̓͜ͅ ̶̧̗̖͔̲̝͍͇̼͒̏̽͗̈̅̎̕n̸̗̫͙̞͗͒̆̇͂̅͆͜ḙ̸̻͕̈͆̋̉̾͌w̵̢̬̹̗̟͈̞͉͎͐̄ͅ ̸̢͉̪͍̹̼̮͚͔̐̉̌͂͂̃̚͜͠͠j̴͖͖̝͛̐̎̅̎̀̑̇͜e̴̩̦̮͙̽̓͂͐̏͝r̸͙̝̙̣͚͕̫̰̓̓̒̉͗̒ͅš̵̪̫͙͔̩̊͊̈̽̿́͋̌̽ë̸͖̹̥́̿̿̒͌̐̈́͝ỹ̷̭͍̿̈͝")
-                elif random.randrange(config.chance2) == 1:
-                    await message.reply("https://i.redd.it/sh4geimk2jv51.jpg")
-                elif random.randrange(config.chance2) == 2:
-                    await message.reply("https://www.youtube.com/watch?v=LTQpFmG2VJk")
-                elif random.randrange(config.chance2) == 3:
-                    await message.reply("https://www.youtube.com/watch?v=l_7XhzCc0-0")
                 else:
-                    await message.reply("I fucking hate new jersey 😡😡😡😡😡😡😡😡😡")
-        if "im " in message.content.lower() or "i'm " in message.content.lower():
-            if "im " in message.content.lower():
-                index = message.content.lower().index("im") + 3
-            if "i'm " in message.content.lower():
-                index = message.content.lower().index("i'm") + 4  # stfu ignore the bad REALLY code
+                    await message.reply(randomString(config.newJerseyReplies))
+        indexIm = containsIm(message.clean_content)
+        if indexIm >= 0:
             if random.randrange(config.chance) == 0:
                 await message.reply("https://discord.com/oauth2/authorize?client_id=503720029456695306&scope=bot&permissions=537263168")
             else:
                 await message.reply(
-                    "Hi " + message.content[index:] + ", I'm dad!")  # warning doesn't matter and i dont cate enough to fix
+                    f"Hi {message.clean_content[indexIm:]}, I'm dad!")
         if random.randrange(config.chance) == 0:
-            await message.channel.send("https://images-ext-1.discordapp.net/external/2kxuirHSrAbZ9wYvmpJDF9XVoRC0cCai_5fLrhdbnf4/%3Fc%3DVjFfZGlzY29yZA/https/media.tenor.com/ZWNF4V4ftdAAAAPo/new-jersey-walter-white-amogus.mp4")
-        if message.content[0] == ")":
-            url = message.content[1:]
-            print(url)
-            await yt(message, url)
+            await message.channel.send("https://media.tenor.com/ZWNF4V4ftdAAAAPo/new-jersey-walter-white-amogus.mp4")
 
-    @loop(seconds=3600)
     async def join_vc(self):
-        audio_files = os.listdir("audio_files")
-        vc_channel = await client.fetch_channel(config.vc_channel_id)  # This may get me r8 limited. fix if it does
-        vc = await vc_channel.connect()
-        vc.play(discord.FFmpegPCMAudio(source="audio_files/" + audio_files[random.randrange(len(audio_files))]))
-        guild = await client.fetch_guild(925208758370590820)
-        if message.guild.voice_client is not None:
-            await guild.voice_client.disconnect()
-        while vc.is_playing():
-            sleep(.1)
+        async def queue_vc():
+            # Randomly change the interval between 5 minutes to 1.5 hours
+            await vc.disconnect()
+            newinterval = random.randint(5 * 60, 90 * 60)
+            self.loop.call_later(
+                newinterval, self.loop.create_task, self.join_vc())
+
+        selectedFile = randomFile("audio_files")
+        # This may get me r8 limited. fix if it does
+        vc_channel: discord.VoiceChannel = await client.fetch_channel(config.vc_channel_id)
+        # If already connected to something, disconnect
+        if vc_channel.guild.voice_client is not None:
+            await vc_channel.guild.voice_client.disconnect()
+
+        # Make sure it's an actual VC, not a text channel
+        if not isinstance(vc_channel, discord.VoiceChannel):
+            print(
+                f"ERROR: channel {config.vc_channel_id} is not a voice channel.")
+            return
+
+        # Play the audio
+        try:
+            vc = await vc_channel.connect()
+        except asyncio.TimeoutError:
+            # Try again later.
+            await queue_vc()
+            return
+        vc.play(discord.FFmpegPCMAudio(selectedFile),
+                after=lambda err=None: self.loop.create_task(queue_vc()))
+        # if message.guild.voice_client is not None:
+        #     await guild.voice_client.disconnect()
 
 
-async def yt(message, url):
-    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist':'True'}
-    FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-    voice = message.author.voice.channel
+async def yt(message: discord.Message, url):
+    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+    FFMPEG_OPTIONS = {
+        'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+
+    # Check that they're actually in a voice channel
+    if message.author.voice is None or message.author.voice.channel is None:
+        await message.reply("You must be in a voice channel to play music.")
+        return
+    voice: discord.VoiceChannel = message.author.voice.channel
+
     with YoutubeDL(YDL_OPTIONS) as ydl:
         info = ydl.extract_info(url, download=False)
         URL = info['formats'][0]['url']
         if info["duration"] > 900:
-            await message.channel.send("Video is too long!")
+            await message.reply("Video is too long!")
             return
-        if "newjersey" in info["title"].lower().replace(" ",""):
-            await message.channel.send("I don't play songs that contain the slander of new jersey!")
+        if containsNJ(info["title"]):
+            await message.reply("I don't play songs that contain the slander of new jersey!")
             return
         if message.guild.voice_client is not None:
             await message.guild.voice_client.disconnect()
         if "static" in info["title"].lower():
-            await message.channel.send("bad toby")
+            await message.reply("bad toby")
             return
         vc = await voice.connect()
-        vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-    await message.channel.send("Playing " + info["title"] + "...")
+        vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS),
+                after=lambda err: client.loop.create_task(vc.disconnect()))
+    await message.reply(f"Playing {info['title']}...")
 
-client = MyClient()
-client.run(f.read())
-f.close()
+
+client = AntiNJClient()
+client.run(token)
