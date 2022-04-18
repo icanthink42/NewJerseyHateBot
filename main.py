@@ -12,6 +12,9 @@ from youtube_dl import YoutubeDL
 tokenFile = open("token", "r")
 token = tokenFile.read()
 tokenFile.close()
+queue = []
+YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
 
 # Picks a random filename in a directory
@@ -66,10 +69,26 @@ class AntiNJClient(discord.Client):
     async def on_message(self, message: discord.Message):
         if message.author.id == 964331688832417802 or message.channel.id in config.banned_channels or message.author.bot:
             return
+        if message.content[0] == ">":
+            url = message.content[1:]
+            with YoutubeDL(YDL_OPTIONS) as ydl:
+                info = ydl.extract_info(url, download=False)
+            await yt(message, url)
+            await message.reply(f"Added {info['title']} to queue...")
+            return
         if message.content[0] == ")":
             url = message.content[1:]
-            print(url)
-            await yt(message, url)
+            with YoutubeDL(YDL_OPTIONS) as ydl:
+                info = ydl.extract_info(url, download=False)
+            queue.append(  # Fuck classes. Dictionaries for life
+                {
+                    "message": message,
+                    "url": url
+                }
+            )
+            if len(queue) < 2:
+                await yt(message, url)
+            await message.reply(f"Playing {info['title']}...")
             return
         if containsNJ(message.content):
             njcount = user.increment_user(message.author.id)
@@ -95,7 +114,8 @@ class AntiNJClient(discord.Client):
         indexIm = containsIm(message.clean_content)
         if indexIm >= 0:
             if random.randrange(config.chance) == 0:
-                await message.reply("https://discord.com/oauth2/authorize?client_id=503720029456695306&scope=bot&permissions=537263168")
+                await message.reply(
+                    "https://discord.com/oauth2/authorize?client_id=503720029456695306&scope=bot&permissions=537263168")
             else:
                 await message.reply(
                     f"Hi {message.clean_content[indexIm:]}, I'm dad!")
@@ -137,9 +157,6 @@ class AntiNJClient(discord.Client):
 
 
 async def yt(message: discord.Message, url):
-    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
-    FFMPEG_OPTIONS = {
-        'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
     # Check that they're actually in a voice channel
     if message.author.voice is None or message.author.voice.channel is None:
@@ -163,8 +180,13 @@ async def yt(message: discord.Message, url):
             return
         vc = await voice.connect()
         vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS),
-                after=lambda err: client.loop.create_task(vc.disconnect()))
-    await message.reply(f"Playing {info['title']}...")
+                after=lambda err: client.loop.create_task(song_finish()))
+
+
+async def song_finish():
+    if len(queue) > 0:
+        await yt(queue[0]["message"], queue[0]["url"])
+        queue.pop(0)
 
 
 client = AntiNJClient()
