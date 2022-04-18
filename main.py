@@ -187,8 +187,8 @@ async def yt(message: discord.Message, url):
 
 async def song_finish():
     if len(queue) > 0:
-        await yt(queue[0]["message"], queue[0]["url"])
         queue.pop(0)
+        await yt(queue[0]["message"], queue[0]["url"])
 
 
 client = AntiNJClient()
