@@ -84,7 +84,7 @@ class AntiNJClient(discord.Client):
                 await message.reply("The queue is empty!")
                 return
             for item in queue:
-                out += "**" + item["info"]["title"] + "** in <#" + str(item["info"]["channel"].id) + "> by " + item["user"].display_name + "\n"
+                out += "**" + item["info"]["title"] + "** in <#" + str(item["channel"].id) + "> by " + item["user"].display_name + "\n"
             await message.reply(out)
             return
         if message.content[0] == ">" or message.content[0] == ")":
