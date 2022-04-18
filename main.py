@@ -88,7 +88,7 @@ class AntiNJClient(discord.Client):
                     info = ydl.extract_info(url, download=False)
             except:
                 await message.reply("Something went wrong while attempting to get the video!")
-            if info["duration"] > 3600:
+            if info["duration"] > config.max_song_length:
                 await message.reply("Video is too long!")
                 return
             if containsNJ(info["title"]):
