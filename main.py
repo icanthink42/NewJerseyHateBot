@@ -74,8 +74,11 @@ class AntiNJClient(discord.Client):
             if message.channel.id == 925208760010551335:
                 await message.reply("I do not play anything in <#925208760010551335>")
                 return
-            with YoutubeDL(YDL_OPTIONS) as ydl:
-                info = ydl.extract_info(url, download=False)
+            try:
+                with YoutubeDL(YDL_OPTIONS) as ydl:
+                    info = ydl.extract_info(url, download=False)
+            except:
+                await message.reply("Something went wrong while attempting to get the video!")
             if info["duration"] > 3600:
                 await message.reply("Video is too long!")
                 return
@@ -91,25 +94,28 @@ class AntiNJClient(discord.Client):
                 await message.reply("You must be in a voice channel to play music.")
                 return
             if message.content[0] == ">":
-                with YoutubeDL(YDL_OPTIONS) as ydl:
-                    info = ydl.extract_info(url, download=False)
                 if len(queue) > 0:
                     queue[0] = {
                             "message": message,
                             "url": url
                         }
+                else:
+                    queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
+                        {
+                            "message": message.author.voice.channel,
+                            "url": url
+                        }
+                    )
                 await yt(message.author.voice.channel, url)
                 await message.reply(f"Playing {info['title']}...")
                 return
             if message.content[0] == ")":
-                with YoutubeDL(YDL_OPTIONS) as ydl:
-                    info = ydl.extract_info(url, download=False)
                 if len(queue) < 1:
                     await yt(message.author.voice.channel, url)
                     await message.reply(f"Playing {info['title']}...")
                 else:
                     await message.reply(f"Added {info['title']} to queue...")
-                queue.append(  # Fuck classes. Dictionaries for life
+                queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
                     {
                         "message": message.author.voice.channel,
                         "url": url
