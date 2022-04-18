@@ -85,8 +85,6 @@ class AntiNJClient(discord.Client):
             if containsNJ(info["title"]):
                 await message.reply("I don't play songs that contain the slander of new jersey!")
                 return
-            if message.guild.voice_client is not None:
-                await message.guild.voice_client.disconnect()
             if "static" in info["title"].lower():
                 await message.reply("bad toby")
                 return
