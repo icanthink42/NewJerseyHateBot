@@ -110,7 +110,7 @@ class AntiNJClient(discord.Client):
                     await message.reply(f"Added {info['title']} to queue...")
                 queue.append(  # Fuck classes. Dictionaries for life
                     {
-                        "message": message,
+                        "message": message.author.voice.channel,
                         "url": url
                     }
                 )
