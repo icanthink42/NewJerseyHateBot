@@ -1,6 +1,7 @@
 import os
 import random
 import pickle
+import time
 
 from discord.utils import get
 
@@ -67,6 +68,10 @@ class AntiNJClient(discord.Client):
         for user_i in user_files:
             user_file = open(f"{config.user_save_dir}/{user_i}", "rb")
             user.users[int(user_i)] = pickle.load(user_file)
+            if len(config.user_reset_values) > 0:
+                for reset in config.user_reset_values:
+                    user.users[int(user_i)].setattr(reset, config.user_reset_values[reset])
+                user.users[int(user_i)].save()
         await self.join_vc()
 
     async def on_message(self, message: discord.Message):
@@ -95,6 +100,13 @@ class AntiNJClient(discord.Client):
                 await message.reply("You must be in a voice channel to play music.")
                 return
             if message.content[0] == ">":
+                c_user = user.get_user(message.author.id)
+                delta_time = time.time() - c_user.last_song_skip
+                if delta_time < config.song_skip_time:
+                    await message.reply("You cannot replace the song for another " + str(round(delta_time / 60, 2)) + " minutes!")
+                    return
+                c_user.last_song_skip = time.time()
+                c_user.save()
                 if len(queue) > 0:
                     queue[0] = {
                             "channel": message.author.voice.channel,

@@ -5,6 +5,7 @@ chance2 = 4
 vc_channel_id = 925208760434192414
 banned_channels = [925208759268147326]
 introduction_channels = [925208759268147327]
+song_skip_time = 600
 
 # A weighted list of replies when somebody says new jersey in chat
 newJerseyReplies = {
@@ -13,4 +14,9 @@ newJerseyReplies = {
     "https://www.youtube.com/watch?v=LTQpFmG2VJk": 1,
     "https://www.youtube.com/watch?v=l_7XhzCc0-0": 1,
     "I fucking hate new jersey 😡😡😡😡😡😡😡😡😡": 8
+}
+
+# The values in here will reset on all users when the bot starts up
+user_reset_values = {
+    "last_song_skip": 0,
 }

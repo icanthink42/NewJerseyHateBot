@@ -8,8 +8,7 @@ class User:
     def __init__(self, discord_id):
         self.discord_id = discord_id
         self.new_jersey_count = 0
-        self.max_song_skips = 3
-        self.song_skips = 3
+        self.last_song_skip = 0
 
     def save(self):
         user_f = open(f"{config.user_save_dir}/{self.discord_id}", "wb")
@@ -23,6 +22,7 @@ def get_user(id: int) -> User:
     if id not in users:
         users[id] = User(id)
     return users[id]
+
 
 def increment_user(id: int) -> int:
     user = get_user(id)
