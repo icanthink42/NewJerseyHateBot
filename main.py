@@ -74,7 +74,7 @@ class AntiNJClient(discord.Client):
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(url, download=False)
             await yt(message, url)
-            await message.reply(f"Added {info['title']} to queue...")
+            await message.reply(f"Playing {info['title']}...")
             return
         if message.content[0] == ")":
             url = message.content[1:]
@@ -87,8 +87,11 @@ class AntiNJClient(discord.Client):
                 }
             )
             if len(queue) < 2:
+                queue.pop(0)
                 await yt(message, url)
-            await message.reply(f"Playing {info['title']}...")
+                await message.reply(f"Playing {info['title']}...")
+            else:
+                await message.reply(f"Added {info['title']} to queue...")
             return
         if containsNJ(message.content):
             njcount = user.increment_user(message.author.id)
