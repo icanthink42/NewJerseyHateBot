@@ -76,6 +76,10 @@ class AntiNJClient(discord.Client):
             url = message.content[1:]
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(url, download=False)
+            queue[0] = {
+                    "message": message,
+                    "url": url
+                }
             await yt(message, url)
             await message.reply(f"Playing {info['title']}...")
             return
