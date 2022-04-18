@@ -70,7 +70,7 @@ class AntiNJClient(discord.Client):
         if message.author.id == 964331688832417802 or message.channel.id in config.banned_channels or message.author.bot:
             return
         if (message.content[0] == ">" or message.content[0] == ")") and message.channel.id == 925208760010551335:
-            await message.reply("I do not playing anything in <#925208760010551335>")
+            await message.reply("I do not play anything in <#925208760010551335>")
             return
         if message.content[0] == ">":
             url = message.content[1:]
