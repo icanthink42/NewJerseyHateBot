@@ -193,7 +193,7 @@ async def yt(channel: discord.VoiceChannel, url):
         URL = info['formats'][0]['url']
         if voice is None:
             vc = await voice.connect()
-        vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS),
+        voice.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS),
                 after=lambda err: client.loop.create_task(song_finish()))
 
 
