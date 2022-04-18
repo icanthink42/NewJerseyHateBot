@@ -103,7 +103,7 @@ class AntiNJClient(discord.Client):
                 c_user = user.get_user(message.author.id)
                 delta_time = time.time() - c_user.last_song_skip
                 if delta_time < config.song_skip_time:
-                    await message.reply("You cannot replace the song for another " + str(round(delta_time / 60, 2)) + " minutes!")
+                    await message.reply("You cannot replace the song for another " + str(round(10 - (delta_time / 60), 2)) + " minutes!")
                     return
                 c_user.last_song_skip = time.time()
                 c_user.save()
