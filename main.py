@@ -1,6 +1,9 @@
 import os
 import random
 import pickle
+
+from discord.utils import get
+
 import user
 import config
 from typing import List, Dict
@@ -188,12 +191,13 @@ class AntiNJClient(discord.Client):
 
 async def yt(channel: discord.VoiceChannel, url):
     voice: discord.VoiceChannel = channel
+    vc = get(client.voice_clients, guild=channel.guild)
     with YoutubeDL(YDL_OPTIONS) as ydl:
         info = ydl.extract_info(url, download=False)
         URL = info['formats'][0]['url']
-        if voice is None:
-            vc = await voice.connect()
-        voice.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS),
+        if not vc.is_connected():
+            await voice.connect()
+        vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS),
                 after=lambda err: client.loop.create_task(song_finish()))
 
 
