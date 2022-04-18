@@ -70,7 +70,7 @@ class AntiNJClient(discord.Client):
             user.users[int(user_i)] = pickle.load(user_file)
             if len(config.user_reset_values) > 0:
                 for reset in config.user_reset_values:
-                    user.users[int(user_i)].setattr(reset, config.user_reset_values[reset])
+                    setattr(user.users[int(user_i)], reset, config.user_reset_values[reset])
                 user.users[int(user_i)].save()
         await self.join_vc()
 
