@@ -78,6 +78,15 @@ class AntiNJClient(discord.Client):
     async def on_message(self, message: discord.Message):
         if message.author.id == 964331688832417802 or message.channel.id in config.banned_channels or message.author.bot:
             return
+        if message.content.replace(" ", "") == "<@964331688832417802>":
+            out = ""
+            if len(queue) < 1:
+                await message.reply("The queue is empty!")
+                return
+            for item in queue:
+                out += "**" + item["info"]["title"] + "** in <#" + str(item["info"]["channel"].id) + "> by " + item["user"].display_name + "\n"
+            await message.reply(out)
+            return
         if message.content[0] == ">" or message.content[0] == ")":
             url = message.content[1:]
             if message.channel.id == 925208760010551335:
@@ -110,16 +119,18 @@ class AntiNJClient(discord.Client):
                 c_user.save()
                 if len(queue) > 0:
                     queue.insert(1, {
-                            "channel": message.author.voice.channel,
-                            "url": url,
-                            "user_id": message.author.id,
+                        "channel": message.author.voice.channel,
+                        "url": url,
+                        "user": message.author,
+                        "info": info,
                         })
                 else:
                     queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
                         {
                             "channel": message.author.voice.channel,
                             "url": url,
-                            "user_id": message.author.id,
+                            "user": message.author,
+                            "info": info,
                         }
                     )
                 await yt(message.author.voice.channel, url)
@@ -128,7 +139,7 @@ class AntiNJClient(discord.Client):
             if message.content[0] == ")":
                 c = 0
                 for item in queue:
-                    if item["user_id"] == message.author.id:
+                    if item["user"].id == message.author.id:
                         c += 1
                 if c >= config.max_queue_per_user:
                     await message.reply("You may only have a maximum of " + str(config.max_queue_per_user) + " songs in the queue at a time!")
@@ -142,7 +153,8 @@ class AntiNJClient(discord.Client):
                     {
                         "channel": message.author.voice.channel,
                         "url": url,
-                        "user_id": message.author.id,
+                        "user": message.author,
+                        "info": info,
                     }
                 )
                 return
