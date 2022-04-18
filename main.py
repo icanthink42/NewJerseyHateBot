@@ -202,6 +202,7 @@ async def yt(channel: discord.VoiceChannel, url):
             vc = await voice.connect()
         vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS),
                 after=lambda err: client.loop.create_task(song_finish()))
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=info['title']))
 
 
 async def song_finish():
