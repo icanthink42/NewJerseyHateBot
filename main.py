@@ -191,7 +191,8 @@ async def yt(channel: discord.VoiceChannel, url):
     with YoutubeDL(YDL_OPTIONS) as ydl:
         info = ydl.extract_info(url, download=False)
         URL = info['formats'][0]['url']
-        vc = await voice.connect()
+        if voice is None:
+            vc = await voice.connect()
         vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS),
                 after=lambda err: client.loop.create_task(song_finish()))
 
