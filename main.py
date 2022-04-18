@@ -111,19 +111,28 @@ class AntiNJClient(discord.Client):
                 if len(queue) > 0:
                     queue[0] = {
                             "channel": message.author.voice.channel,
-                            "url": url
+                            "url": url,
+                            "user_id": message.author.id,
                         }
                 else:
                     queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
                         {
                             "channel": message.author.voice.channel,
-                            "url": url
+                            "url": url,
+                            "user_id": message.author.id,
                         }
                     )
                 await yt(message.author.voice.channel, url)
                 await message.reply(f"Playing {info['title']}...")
                 return
             if message.content[0] == ")":
+                c = 0
+                for item in queue:
+                    if item["user_id"] == message.author.id:
+                        c += 1
+                if c >= config.max_queue_per_user:
+                    await message.reply("You may only have a maximum of " + str(config.max_queue_per_user) + " songs in the queue at a time!")
+                    return
                 if len(queue) < 1:
                     await yt(message.author.voice.channel, url)
                     await message.reply(f"Playing {info['title']}...")
@@ -132,7 +141,8 @@ class AntiNJClient(discord.Client):
                 queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
                     {
                         "channel": message.author.voice.channel,
-                        "url": url
+                        "url": url,
+                        "user_id": message.author.id,
                     }
                 )
                 return

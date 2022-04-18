@@ -6,6 +6,7 @@ vc_channel_id = 925208760434192414
 banned_channels = [925208759268147326]
 introduction_channels = [925208759268147327]
 song_skip_time = 600
+max_queue_per_user = 2
 
 # A weighted list of replies when somebody says new jersey in chat
 newJerseyReplies = {
