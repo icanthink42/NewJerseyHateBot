@@ -196,7 +196,7 @@ async def yt(channel: discord.VoiceChannel, url):
         info = ydl.extract_info(url, download=False)
         URL = info['formats'][0]['url']
         if vc is None or not vc.is_connected():
-            await voice.connect()
+            vc = await voice.connect()
         vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS),
                 after=lambda err: client.loop.create_task(song_finish()))
 
