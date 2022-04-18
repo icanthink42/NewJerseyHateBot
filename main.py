@@ -209,6 +209,8 @@ async def song_finish():
     queue.pop(0)
     if len(queue) > 0:
         await yt(queue[0]["channel"], queue[0]["url"])
+    else:
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="nothing. Play a song!"))
 
 
 client = AntiNJClient()
