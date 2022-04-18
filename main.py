@@ -96,13 +96,13 @@ class AntiNJClient(discord.Client):
             if message.content[0] == ">":
                 if len(queue) > 0:
                     queue[0] = {
-                            "message": message,
+                            "channel": message.author.voice.channel,
                             "url": url
                         }
                 else:
                     queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
                         {
-                            "message": message.author.voice.channel,
+                            "channel": message.author.voice.channel,
                             "url": url
                         }
                     )
@@ -117,7 +117,7 @@ class AntiNJClient(discord.Client):
                     await message.reply(f"Added {info['title']} to queue...")
                 queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
                     {
-                        "message": message.author.voice.channel,
+                        "channel": message.author.voice.channel,
                         "url": url
                     }
                 )
@@ -201,7 +201,7 @@ async def yt(channel: discord.VoiceChannel, url):
 async def song_finish():
     queue.pop(0)
     if len(queue) > 0:
-        await yt(queue[0]["message"], queue[0]["url"])
+        await yt(queue[0]["channel"], queue[0]["url"])
 
 
 client = AntiNJClient()
