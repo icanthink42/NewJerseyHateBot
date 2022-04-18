@@ -69,36 +69,52 @@ class AntiNJClient(discord.Client):
     async def on_message(self, message: discord.Message):
         if message.author.id == 964331688832417802 or message.channel.id in config.banned_channels or message.author.bot:
             return
-        if (message.content[0] == ">" or message.content[0] == ")") and message.channel.id == 925208760010551335:
-            await message.reply("I do not play anything in <#925208760010551335>")
-            return
-        if message.content[0] == ">":
+        if message.content[0] == ">" or message.content[0] == ")":
             url = message.content[1:]
+            if message.channel.id == 925208760010551335:
+                await message.reply("I do not play anything in <#925208760010551335>")
+                return
             with YoutubeDL(YDL_OPTIONS) as ydl:
                 info = ydl.extract_info(url, download=False)
-            queue[0] = {
-                    "message": message,
-                    "url": url
-                }
-            await yt(message, url)
-            await message.reply(f"Playing {info['title']}...")
-            return
-        if message.content[0] == ")":
-            url = message.content[1:]
-            with YoutubeDL(YDL_OPTIONS) as ydl:
-                info = ydl.extract_info(url, download=False)
-            if len(queue) < 1:
-                await yt(message, url)
+            if info["duration"] > 3600:
+                await message.reply("Video is too long!")
+                return
+            if containsNJ(info["title"]):
+                await message.reply("I don't play songs that contain the slander of new jersey!")
+                return
+            if message.guild.voice_client is not None:
+                await message.guild.voice_client.disconnect()
+            if "static" in info["title"].lower():
+                await message.reply("bad toby")
+                return
+            if message.author.voice is None or message.author.voice.channel is None:
+                await message.reply("You must be in a voice channel to play music.")
+                return
+            if message.content[0] == ">":
+                with YoutubeDL(YDL_OPTIONS) as ydl:
+                    info = ydl.extract_info(url, download=False)
+                queue[0] = {
+                        "message": message,
+                        "url": url
+                    }
+                await yt(message.channel, url)
                 await message.reply(f"Playing {info['title']}...")
-            else:
-                await message.reply(f"Added {info['title']} to queue...")
-            queue.append(  # Fuck classes. Dictionaries for life
-                {
-                    "message": message,
-                    "url": url
-                }
-            )
-            return
+                return
+            if message.content[0] == ")":
+                with YoutubeDL(YDL_OPTIONS) as ydl:
+                    info = ydl.extract_info(url, download=False)
+                if len(queue) < 1:
+                    await yt(message.channel, url)
+                    await message.reply(f"Playing {info['title']}...")
+                else:
+                    await message.reply(f"Added {info['title']} to queue...")
+                queue.append(  # Fuck classes. Dictionaries for life
+                    {
+                        "message": message,
+                        "url": url
+                    }
+                )
+                return
         if containsNJ(message.content):
             njcount = user.increment_user(message.author.id)
             if njcount % 100 == 0:
@@ -165,28 +181,11 @@ class AntiNJClient(discord.Client):
         #     await guild.voice_client.disconnect()
 
 
-async def yt(message: discord.Message, url):
-
-    # Check that they're actually in a voice channel
-    if message.author.voice is None or message.author.voice.channel is None:
-        await message.reply("You must be in a voice channel to play music.")
-        return
-    voice: discord.VoiceChannel = message.author.voice.channel
-
+async def yt(channel: discord.VoiceChannel, url):
+    voice: discord.VoiceChannel = channel
     with YoutubeDL(YDL_OPTIONS) as ydl:
         info = ydl.extract_info(url, download=False)
         URL = info['formats'][0]['url']
-        if info["duration"] > 900:
-            await message.reply("Video is too long!")
-            return
-        if containsNJ(info["title"]):
-            await message.reply("I don't play songs that contain the slander of new jersey!")
-            return
-        if message.guild.voice_client is not None:
-            await message.guild.voice_client.disconnect()
-        if "static" in info["title"].lower():
-            await message.reply("bad toby")
-            return
         vc = await voice.connect()
         vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS),
                 after=lambda err: client.loop.create_task(song_finish()))
