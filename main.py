@@ -104,7 +104,7 @@ class AntiNJClient(discord.Client):
                 with YoutubeDL(YDL_OPTIONS) as ydl:
                     info = ydl.extract_info(url, download=False)
                 if len(queue) < 1:
-                    await yt(message.author, url)
+                    await yt(message.author.voice.channel, url)
                     await message.reply(f"Playing {info['title']}...")
                 else:
                     await message.reply(f"Added {info['title']} to queue...")
