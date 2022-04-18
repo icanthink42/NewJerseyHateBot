@@ -109,11 +109,11 @@ class AntiNJClient(discord.Client):
                 c_user.last_song_skip = time.time()
                 c_user.save()
                 if len(queue) > 0:
-                    queue[0] = {
+                    queue.insert(1, {
                             "channel": message.author.voice.channel,
                             "url": url,
                             "user_id": message.author.id,
-                        }
+                        })
                 else:
                     queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
                         {
