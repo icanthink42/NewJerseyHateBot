@@ -86,8 +86,7 @@ class AntiNJClient(discord.Client):
                     "url": url
                 }
             )
-            if len(queue) < 2:
-                queue.pop(0)
+            if len(queue) < 1:
                 await yt(message, url)
                 await message.reply(f"Playing {info['title']}...")
             else:
