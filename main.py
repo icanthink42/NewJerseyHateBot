@@ -21,6 +21,16 @@ queue = []
 YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
 FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
+class QueueSong:
+    def __init__(self, channel, url, user, info):
+        # The discord voice Channel for this song.
+        self.channel = channel
+        # A string, the URL of the song. Passed to youtube_dl.
+        self.url = url
+        # The message author for the person who queued this song.
+        self.user = user
+        # The youtube_dl info of the song.
+        self.info = info
 
 # Picks a random filename in a directory
 def randomFile(dir: str) -> str:
@@ -84,7 +94,7 @@ class AntiNJClient(discord.Client):
                 await message.reply("The queue is empty!")
                 return
             for item in queue:
-                out += "**" + item["info"]["title"] + "** in <#" + str(item["channel"].id) + "> by " + item["user"].display_name + "\n"
+                out += "**" + item.info["title"] + "** in <#" + str(item.channel.id) + "> by " + item.user.display_name + "\n"
             await message.reply(out)
             return
         if message.content[0] == ">" or message.content[0] == ")":
@@ -118,29 +128,18 @@ class AntiNJClient(discord.Client):
                 c_user.skip_count += 1
                 c_user.last_song_skip = time.time()
                 c_user.save()
+                song = QueueSong(message.author.voice.channel, url, message.author, info)
                 if len(queue) > 0:
-                    queue.insert(1, {
-                        "channel": message.author.voice.channel,
-                        "url": url,
-                        "user": message.author,
-                        "info": info,
-                        })
+                    queue.insert(1, song)
                 else:
-                    queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
-                        {
-                            "channel": message.author.voice.channel,
-                            "url": url,
-                            "user": message.author,
-                            "info": info,
-                        }
-                    )
+                    queue.append(song)
                 await yt(message.author.voice.channel, url)
                 await message.reply(f"Playing {info['title']}... (You've skipped " + str(c_user.skip_count) + " songs)")
                 return
             if message.content[0] == ")":
                 c = 0
                 for item in queue:
-                    if item["user"].id == message.author.id:
+                    if item.user.id == message.author.id:
                         c += 1
                 if c >= config.max_queue_per_user and message.author.id not in config.moderators:
                     await message.reply("You may only have a maximum of " + str(config.max_queue_per_user) + " songs in the queue at a time!")
@@ -150,14 +149,7 @@ class AntiNJClient(discord.Client):
                     await message.reply(f"Playing {info['title']}...")
                 else:
                     await message.reply(f"Added {info['title']} to queue...")
-                queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
-                    {
-                        "channel": message.author.voice.channel,
-                        "url": url,
-                        "user": message.author,
-                        "info": info,
-                    }
-                )
+                queue.append(QueueSong(message.author.voice.channel, url, message.author, info))
                 return
         if message.content == "<ForceJoinVC":
             await self.join_vc(self)
@@ -199,7 +191,7 @@ class AntiNJClient(discord.Client):
             # Randomly change the interval between 5 minutes to 1.5 hours
             if len(queue) > 1:
                 queue.pop(0)
-                await yt(queue[0]["channel"], queue[0]["url"])
+                await yt(queue[0].channel, queue[0].url)
             elif len(queue) == 1:
                 queue.pop(0)
             else:
@@ -253,7 +245,7 @@ async def yt(channel: discord.VoiceChannel, url):
 async def song_finish():
     queue.pop(0)
     if len(queue) > 0:
-        await yt(queue[0]["channel"], queue[0]["url"])
+        await yt(queue[0].channel, queue[0].url)
     else:
         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="nothing. Play a song!"))
 
