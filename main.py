@@ -112,7 +112,7 @@ class AntiNJClient(discord.Client):
             if message.content[0] == ">":
                 c_user = user.get_user(message.author.id)
                 delta_time = time.time() - c_user.last_song_skip
-                if delta_time < config.song_skip_time:
+                if delta_time < config.song_skip_time and message.author.id not in config.moderators:
                     await message.reply("You cannot replace the song for another " + str(math.floor((config.song_skip_time - delta_time) / 60)) + " minutes and " + str(round((config.song_skip_time - delta_time) % 60, 0)) + " seconds!")
                     return
                 c_user.last_song_skip = time.time()
@@ -141,7 +141,7 @@ class AntiNJClient(discord.Client):
                 for item in queue:
                     if item["user"].id == message.author.id:
                         c += 1
-                if c >= config.max_queue_per_user:
+                if c >= config.max_queue_per_user and message.author.id not in config.moderators:
                     await message.reply("You may only have a maximum of " + str(config.max_queue_per_user) + " songs in the queue at a time!")
                     return
                 if len(queue) < 1:
