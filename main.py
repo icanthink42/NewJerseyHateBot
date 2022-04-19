@@ -193,7 +193,13 @@ class AntiNJClient(discord.Client):
     async def join_vc(self):
         async def queue_vc():
             # Randomly change the interval between 5 minutes to 1.5 hours
-            await vc.disconnect()
+            if len(queue) > 1:
+                queue.pop(0)
+                await yt(queue[0]["channel"], queue[0]["url"])
+            elif len(queue) == 1:
+                queue.pop(0)
+            else:
+                await vc.disconnect()
             newinterval = random.randint(5 * 60, 90 * 60)
             self.loop.call_later(
                 newinterval, self.loop.create_task, self.join_vc())
