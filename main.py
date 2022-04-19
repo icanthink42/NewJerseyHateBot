@@ -159,7 +159,7 @@ class AntiNJClient(discord.Client):
                 )
                 return
         if message.content == "<ForceJoinVC":
-            join_vc(self)
+            await self.join_vc(self)
             return
         if containsNJ(message.content):
             njcount = user.increment_user(message.author.id)
