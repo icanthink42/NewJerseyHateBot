@@ -22,7 +22,7 @@ YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
 FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
 class QueueSong:
-    def __init__(channel, url, user, info):
+    def __init__(self, channel, url, user, info):
         # The discord voice Channel for this song.
         self.channel = channel
         # A string, the URL of the song. Passed to youtube_dl.
