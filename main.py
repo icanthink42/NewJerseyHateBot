@@ -115,6 +115,7 @@ class AntiNJClient(discord.Client):
                 if delta_time < config.song_skip_time and message.author.id not in config.moderators:
                     await message.reply("You cannot replace the song for another " + str(math.floor((config.song_skip_time - delta_time) / 60)) + " minutes and " + str(round((config.song_skip_time - delta_time) % 60, 0)) + " seconds!")
                     return
+                c_user.skip_count += 1
                 c_user.last_song_skip = time.time()
                 c_user.save()
                 if len(queue) > 0:
@@ -134,7 +135,7 @@ class AntiNJClient(discord.Client):
                         }
                     )
                 await yt(message.author.voice.channel, url)
-                await message.reply(f"Playing {info['title']}...")
+                await message.reply(f"Playing {info['title']}... (You've skipped " + str(c_user.skip_count) + " songs)")
                 return
             if message.content[0] == ")":
                 c = 0
