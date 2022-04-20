@@ -305,6 +305,8 @@ async def song_finish():
     if len(queue) > 0:
         await yt(queue[0]["channel"], queue[0]["url"])
     else:
+        channel = await client.fetch_channel(925208760434192414)
+        await yt(channel,"https://youtu.be/wrdK57qgNqA")
         await client.change_presence(
             activity=discord.Activity(type=discord.ActivityType.listening, name="nothing. Play a song!"))
 
