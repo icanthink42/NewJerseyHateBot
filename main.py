@@ -156,6 +156,9 @@ class AntiNJClient(discord.Client):
             if message.author.voice is None or message.author.voice.channel is None:
                 await message.reply("You must be in a voice channel to play music.")
                 return
+            if "toby" in message.author.display_name.lower():
+                await message.reply("I'm very sorry but because your name contains \"toby\" you cannot play music. Please contact <@343545158140428289> if this is a mistake!")
+                return
             if message.content[0] == ">":
                 c_user = user.get_user(message.author.id)
                 delta_time = time.time() - c_user.last_song_skip
@@ -306,7 +309,7 @@ async def song_finish():
         await yt(queue[0]["channel"], queue[0]["url"])
     else:
         channel = await client.fetch_channel(925208760434192414)
-        await yt(channel,"https://youtu.be/wrdK57qgNqA")
+        await yt(channel, "https://youtu.be/wrdK57qgNqA")
         await client.change_presence(
             activity=discord.Activity(type=discord.ActivityType.listening, name="nothing. Play a song!"))
 
