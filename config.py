@@ -20,6 +20,4 @@ newJerseyReplies = {
 }
 
 # The values in here will reset on all users when the bot starts up
-user_reset_values = {
-    "skip_count": 0
-}
+user_reset_values = {}
