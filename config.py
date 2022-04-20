@@ -20,6 +20,4 @@ newJerseyReplies = {
 }
 
 # The values in here will reset on all users when the bot starts up
-user_reset_values = {
-    "jersey_coins": 1000
-}
+user_reset_values = {}
