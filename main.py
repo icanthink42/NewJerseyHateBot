@@ -159,10 +159,6 @@ class AntiNJClient(discord.Client):
             if "toby" in message.author.display_name.lower():
                 await message.reply("I'm very sorry but because your name contains \"toby\" you cannot play music. Please contact <@343545158140428289> if this is a mistake!")
                 return
-            if config.prospective_students in message.author.roles:
-                await message.reply(
-                    "You may not play songs as a prospective student!")
-                return
             if message.content[0] == ">":
                 c_user = user.get_user(message.author.id)
                 delta_time = time.time() - c_user.last_song_skip
