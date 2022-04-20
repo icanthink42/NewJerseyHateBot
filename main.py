@@ -62,7 +62,7 @@ def containsIm(text: str) -> int:
     return -1
 
 def get_user_from_at(at: str):
-    str_id = at.replace("<", "").replace(">", "").replace("#", "")
+    str_id = at.replace("<", "").replace(">", "").replace("@", "")
     int_id = int(str_id)
     if int_id in user.users:
         return user.get_user(int_id)
@@ -129,7 +129,7 @@ class AntiNJClient(discord.Client):
                 a_user.jersey_coins += amount
                 c_user.save()
                 a_user.save()
-                await message.reply("<@" + str(a_user.discord_id) + "> has " + str(a_user.jersey_coins) + " jersey coins!")
+                await message.reply("Payment successful!")
                 return
             else:
                 await message.reply("Could not find that user!")
