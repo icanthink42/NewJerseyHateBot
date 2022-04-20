@@ -10,6 +10,7 @@ class User:
         self.new_jersey_count = 0
         self.last_song_skip = 0
         self.skip_count = 0
+        self.jersey_coins = 0
 
     def save(self):
         user_f = open(f"{config.user_save_dir}/{self.discord_id}", "wb")

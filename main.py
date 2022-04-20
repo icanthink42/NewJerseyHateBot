@@ -21,6 +21,7 @@ queue = []
 YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
 FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
+
 # Picks a random filename in a directory
 def randomFile(dir: str) -> str:
     fileNames: List[str] = os.listdir(dir)
@@ -39,7 +40,7 @@ def randomString(choices: Dict[str, int]) -> str:
         passedWeight += choices[key]
         if passedWeight > selectedWeight:
             return key
-    raise RuntimeError("This should'nt be able to happen.")
+    raise RuntimeError("This shouldn't be able to happen.")
 
 
 # Returns true if "new jersey" is in the string
@@ -72,6 +73,13 @@ def containsYour(text: str) -> int:
     # Not found
     return -1
 
+def get_user_from_at(at: str):
+    str_id = at.replace("<", "").replace(">", "").replace("@", "")
+    int_id = int(str_id)
+    if int_id in user.users:
+        return user.get_user(int_id)
+
+
 class AntiNJClient(discord.Client):
     async def on_ready(self):
         print(f"Logged on as {self.user}!")
@@ -86,6 +94,7 @@ class AntiNJClient(discord.Client):
         await self.join_vc()
 
     async def on_message(self, message: discord.Message):
+        split_message = message.content.split(" ")
         if message.author.id == 964331688832417802 or message.channel.id in config.banned_channels or message.author.bot:
             return
         if message.content.replace(" ", "") == "<@964331688832417802>":
@@ -94,9 +103,49 @@ class AntiNJClient(discord.Client):
                 await message.reply("The queue is empty!")
                 return
             for item in queue:
-                out += "**" + item["info"]["title"] + "** in <#" + str(item["channel"].id) + "> by " + item["user"].display_name + "\n"
+                out += "**" + item["info"]["title"] + "** in <#" + str(item["channel"].id) + "> by " + item[
+                    "user"].display_name + "\n"
             await message.reply(out)
             return
+        if split_message[0] == "bal":
+            if len(split_message) == 1:
+                c_user = user.get_user(message.author.id)
+                await message.reply("You have " + str(c_user.jersey_coins) + " jersey coins!")
+                return
+            elif get_user_from_at(split_message[1]) is not None:
+                a_user = get_user_from_at(split_message[1])
+                await message.reply("<@" + str(a_user.discord_id) + "> has " + str(a_user.jersey_coins) + " jersey coins!")
+                return
+            else:
+                await message.reply("Could not find that user!")
+                return
+        if split_message[0] == "pay":
+            if len(split_message) != 3:
+                await message.reply("Usage: pay <user> <amount>")
+                return
+            elif get_user_from_at(split_message[1]) is not None:
+                a_user = get_user_from_at(split_message[1])
+                c_user = user.get_user(message.author.id)
+                try:
+                    amount = float(split_message[2])
+                except ValueError:
+                    await message.reply("Usage: pay <user> <amount>")
+                    return
+                if amount < 0:
+                    await message.reply("You may not pay negative jersey coins!")
+                    return
+                if c_user.jersey_coins - amount < 0:
+                    await message.reply("You do not have enough jersey coins to make that payment!")
+                    return
+                c_user.jersey_coins -= amount
+                a_user.jersey_coins += amount
+                c_user.save()
+                a_user.save()
+                await message.reply("Payment successful!")
+                return
+            else:
+                await message.reply("Could not find that user!")
+                return
         if message.content[0] == ">" or message.content[0] == ")":
             url = message.content[1:]
             if message.channel.id == 925208760010551335:
@@ -119,11 +168,20 @@ class AntiNJClient(discord.Client):
             if message.author.voice is None or message.author.voice.channel is None:
                 await message.reply("You must be in a voice channel to play music.")
                 return
+            if "toby" in message.author.display_name.lower():
+                await message.reply("I'm very sorry but because your name contains \"toby\" you cannot play music. Please contact <@343545158140428289> if this is a mistake!")
+                return
+            if config.prospective_students in message.author.roles:
+                await message.reply(
+                    "You may not play songs as a prospective student!")
+                return
             if message.content[0] == ">":
                 c_user = user.get_user(message.author.id)
                 delta_time = time.time() - c_user.last_song_skip
                 if delta_time < config.song_skip_time and message.author.id not in config.moderators:
-                    await message.reply("You cannot replace the song for another " + str(math.floor((config.song_skip_time - delta_time) / 60)) + " minutes and " + str(round((config.song_skip_time - delta_time) % 60, 0)) + " seconds!")
+                    await message.reply("You cannot replace the song for another " + str(
+                        math.floor((config.song_skip_time - delta_time) / 60)) + " minutes and " + str(
+                        round((config.song_skip_time - delta_time) % 60, 0)) + " seconds!")
                     return
                 c_user.skip_count += 1
                 c_user.last_song_skip = time.time()
@@ -134,7 +192,7 @@ class AntiNJClient(discord.Client):
                         "url": url,
                         "user": message.author,
                         "info": info,
-                        })
+                    })
                 else:
                     queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
                         {
@@ -153,7 +211,8 @@ class AntiNJClient(discord.Client):
                     if item["user"].id == message.author.id:
                         c += 1
                 if c >= config.max_queue_per_user and message.author.id not in config.moderators:
-                    await message.reply("You may only have a maximum of " + str(config.max_queue_per_user) + " songs in the queue at a time!")
+                    await message.reply("You may only have a maximum of " + str(
+                        config.max_queue_per_user) + " songs in the queue at a time!")
                     return
                 if len(queue) < 1:
                     await yt(message.author.voice.channel, url)
@@ -268,7 +327,10 @@ async def song_finish():
     if len(queue) > 0:
         await yt(queue[0]["channel"], queue[0]["url"])
     else:
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="nothing. Play a song!"))
+        channel = await client.fetch_channel(925208760434192414)
+        await yt(channel, "https://youtu.be/wrdK57qgNqA")
+        await client.change_presence(
+            activity=discord.Activity(type=discord.ActivityType.listening, name="nothing. Play a song!"))
 
 
 client = AntiNJClient()
