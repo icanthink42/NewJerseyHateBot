@@ -61,6 +61,18 @@ def containsIm(text: str) -> int:
     # Not found
     return -1
 
+def containsYour(text: str) -> int:
+    # "Im"
+    index = text.lower().find("youre ")
+    if index == 0 or (index > 0 and text[index - 1].isspace()):
+        return index + 5
+    # "I'm"
+    index = text.lower().find("you're ")
+    if index == 0 or (index > 0 and text[index - 1].isspace()):
+        return index + 6
+    # Not found
+    return -1
+
 def get_user_from_at(at: str):
     str_id = at.replace("<", "").replace(">", "").replace("@", "")
     int_id = int(str_id)
@@ -248,6 +260,9 @@ class AntiNJClient(discord.Client):
             else:
                 await message.reply(
                     f"Hi {message.clean_content[indexIm:]}, I'm dad!")
+        indexIm = containsYour(message.clean_content)
+        if indexIm >= 0:
+            await message.reply(f"I'm not {message.clean_content[indexIm:]}, I'm <@964331688832417802>!")
         if random.randrange(config.chance) == 0:
             await message.channel.send("https://media.tenor.com/ZWNF4V4ftdAAAAPo/new-jersey-walter-white-amogus.mp4")
 
