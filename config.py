@@ -8,6 +8,7 @@ introduction_channels = [925208759268147327]
 song_skip_time = 600
 max_queue_per_user = 2
 max_song_length = 1200
+prospective_students = 944353239543992330
 moderators = [343545158140428289]
 
 # A weighted list of replies when somebody says new jersey in chat
