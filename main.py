@@ -21,6 +21,7 @@ queue = []
 YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
 FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
+
 # Picks a random filename in a directory
 def randomFile(dir: str) -> str:
     fileNames: List[str] = os.listdir(dir)
@@ -39,7 +40,7 @@ def randomString(choices: Dict[str, int]) -> str:
         passedWeight += choices[key]
         if passedWeight > selectedWeight:
             return key
-    raise RuntimeError("This should'nt be able to happen.")
+    raise RuntimeError("This shouldn't be able to happen.")
 
 
 # Returns true if "new jersey" is in the string
@@ -83,7 +84,8 @@ class AntiNJClient(discord.Client):
                 await message.reply("The queue is empty!")
                 return
             for item in queue:
-                out += "**" + item["info"]["title"] + "** in <#" + str(item["channel"].id) + "> by " + item["user"].display_name + "\n"
+                out += "**" + item["info"]["title"] + "** in <#" + str(item["channel"].id) + "> by " + item[
+                    "user"].display_name + "\n"
             await message.reply(out)
             return
         if message.content[0] == ">" or message.content[0] == ")":
@@ -112,7 +114,9 @@ class AntiNJClient(discord.Client):
                 c_user = user.get_user(message.author.id)
                 delta_time = time.time() - c_user.last_song_skip
                 if delta_time < config.song_skip_time and message.author.id not in config.moderators:
-                    await message.reply("You cannot replace the song for another " + str(math.floor((config.song_skip_time - delta_time) / 60)) + " minutes and " + str(round((config.song_skip_time - delta_time) % 60, 0)) + " seconds!")
+                    await message.reply("You cannot replace the song for another " + str(
+                        math.floor((config.song_skip_time - delta_time) / 60)) + " minutes and " + str(
+                        round((config.song_skip_time - delta_time) % 60, 0)) + " seconds!")
                     return
                 c_user.skip_count += 1
                 c_user.last_song_skip = time.time()
@@ -123,7 +127,7 @@ class AntiNJClient(discord.Client):
                         "url": url,
                         "user": message.author,
                         "info": info,
-                        })
+                    })
                 else:
                     queue.append(  # Fuck classes. Dictionaries for life. I regret this now.
                         {
@@ -142,7 +146,8 @@ class AntiNJClient(discord.Client):
                     if item["user"].id == message.author.id:
                         c += 1
                 if c >= config.max_queue_per_user and message.author.id not in config.moderators:
-                    await message.reply("You may only have a maximum of " + str(config.max_queue_per_user) + " songs in the queue at a time!")
+                    await message.reply("You may only have a maximum of " + str(
+                        config.max_queue_per_user) + " songs in the queue at a time!")
                     return
                 if len(queue) < 1:
                     await yt(message.author.voice.channel, url)
@@ -254,7 +259,8 @@ async def song_finish():
     if len(queue) > 0:
         await yt(queue[0]["channel"], queue[0]["url"])
     else:
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="nothing. Play a song!"))
+        await client.change_presence(
+            activity=discord.Activity(type=discord.ActivityType.listening, name="nothing. Play a song!"))
 
 
 client = AntiNJClient()
