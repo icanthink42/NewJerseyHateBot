@@ -61,6 +61,12 @@ def containsIm(text: str) -> int:
     # Not found
     return -1
 
+def get_user_from_at(at: str):
+    str_id = at.replace("<", "").replace(">", "").replace("#", "")
+    int_id = int(str_id)
+    if int_id in user.users:
+        return user.get_user(int_id)
+
 
 class AntiNJClient(discord.Client):
     async def on_ready(self):
@@ -76,6 +82,7 @@ class AntiNJClient(discord.Client):
         await self.join_vc()
 
     async def on_message(self, message: discord.Message):
+        split_message = message.content.split(" ")
         if message.author.id == 964331688832417802 or message.channel.id in config.banned_channels or message.author.bot:
             return
         if message.content.replace(" ", "") == "<@964331688832417802>":
@@ -88,6 +95,45 @@ class AntiNJClient(discord.Client):
                     "user"].display_name + "\n"
             await message.reply(out)
             return
+        if split_message[0] == "bal":
+            if len(split_message) == 1:
+                c_user = user.get_user(message.author.id)
+                await message.reply("You have " + str(c_user.jersey_coins) + " jersey coins!")
+                return
+            elif get_user_from_at(split_message[1]) is not None:
+                a_user = get_user_from_at(split_message[1])
+                await message.reply("<@" + str(a_user.discord_id) + "> has " + str(a_user.jersey_coins) + " jersey coins!")
+                return
+            else:
+                await message.reply("Could not find that user!")
+                return
+        if split_message[0] == "pay":
+            if len(split_message) != 3:
+                await message.reply("Usage: pay <user> <amount>")
+                return
+            elif get_user_from_at(split_message[1]) is not None:
+                a_user = get_user_from_at(split_message[1])
+                c_user = user.get_user(message.author.id)
+                try:
+                    amount = float(split_message[2])
+                except ValueError:
+                    await message.reply("Usage: pay <user> <amount>")
+                    return
+                if amount < 0:
+                    await message.reply("You may not pay negative jersey coins!")
+                    return
+                if c_user.jersey_coins - amount < 0:
+                    await message.reply("You do not have enough jersey coins to make that payment!")
+                    return
+                c_user.jersey_coins -= amount
+                a_user.jersey_coins += amount
+                c_user.save()
+                a_user.save()
+                await message.reply("<@" + str(a_user.discord_id) + "> has " + str(a_user.jersey_coins) + " jersey coins!")
+                return
+            else:
+                await message.reply("Could not find that user!")
+                return
         if message.content[0] == ">" or message.content[0] == ")":
             url = message.content[1:]
             if message.channel.id == 925208760010551335:
