@@ -10,6 +10,7 @@ max_queue_per_user = 2
 max_song_length = 1200
 prospective_students = 944353239543992330
 moderators = [343545158140428289]
+output_path = "data.txt"
 
 # A weighted list of replies when somebody says new jersey in chat
 newJerseyReplies = {
