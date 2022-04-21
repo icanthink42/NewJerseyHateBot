@@ -71,6 +71,7 @@ def get_user_from_at(at: str):
 class AntiNJClient(discord.Client):
     async def on_ready(self):
         print(f"Logged on as {self.user}!")
+        self.disabled = False
         user_files = os.listdir(config.user_save_dir)
         for user_i in user_files:
             user_file = open(f"{config.user_save_dir}/{user_i}", "rb")
@@ -83,6 +84,17 @@ class AntiNJClient(discord.Client):
 
     async def on_message(self, message: discord.Message):
         split_message = message.content.split(" ")
+        if self.disabled:
+            return
+        if split_message[0] == "!getdata" and message.author.id:
+            self.disabled = True
+            await message.reply("Getting data... All bot functions have been temporarily disabled to conserve API rate limit!")
+            print("Generating Data...")
+            async for message in message.channel.history(limit=1000000):
+                file = open(config.output_path, "a")
+                file.write("!" + str(message.author.id) + ":" + message.content + "§\n\n")
+            self.disabled = False
+            await message.reply("Done!")
         if message.author.id == 964331688832417802 or message.channel.id in config.banned_channels or message.author.bot:
             return
         if message.content.replace(" ", "") == "<@964331688832417802>":
