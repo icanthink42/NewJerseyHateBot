@@ -109,6 +109,33 @@ class AntiNJClient(discord.Client):
             await message.reply("Done!")
         if message.author.id == 964331688832417802 or message.channel.id in config.banned_channels or message.author.bot:
             return
+        if split_message[0] == "!setiq":
+            if len(split_message) != 2:
+                await message.reply("Usage: !setiq <iq>")
+                return
+            try:
+                iq = float(split_message[1])
+            except ValueError:
+                await message.reply("Usage: !setiq <iq>")
+                return
+            c_user = user.get_user(message.author.id)
+            c_user.iq = iq
+            c_user.save()
+            await message.reply("Updated your IQ!")
+            return
+        if split_message[0] == "!getiq":
+            if len(split_message) != 2:
+                await message.reply("Usage: !getiq <user>")
+                return
+            if get_user_from_at(split_message[1]) is None:
+                await message.reply("Usage: !getiq <user>")
+                return
+            a_user = get_user_from_at(split_message[1])
+            if not hasattr(a_user, "iq"):
+                await message.reply("User has not set an IQ. It must be super low!")
+                return
+            await message.reply("<@" + str(a_user.discord_id) + ">'s iq is " + str(a_user.iq))
+            return
         if message.content.replace(" ", "") == "<@964331688832417802>":
             out = ""
             if len(queue) < 1:
