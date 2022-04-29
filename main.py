@@ -362,7 +362,10 @@ async def yt(channel: discord.VoiceChannel, url):
 
 
 async def song_finish():
-    queue.pop(0)
+    try:
+        queue.pop(0)
+    except IndexError:
+        pass
     if len(queue) > 0:
         await yt(queue[0]["channel"], queue[0]["url"])
     else:
