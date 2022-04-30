@@ -1,3 +1,4 @@
+import datetime
 import math
 import os
 import random
@@ -362,13 +363,14 @@ async def yt(channel: discord.VoiceChannel, url):
 
 
 async def song_finish():
+    before_len = len(queue)
     try:
         queue.pop(0)
     except IndexError:
         pass
     if len(queue) > 0:
         await yt(queue[0]["channel"], queue[0]["url"])
-    else:
+    elif before_len == 0 and datetime.datetime.today().weekday() == 1:
         channel = await client.fetch_channel(925208760434192414)
         await yt(channel, "https://youtu.be/wrdK57qgNqA")
         await client.change_presence(
