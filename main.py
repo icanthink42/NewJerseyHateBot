@@ -100,7 +100,7 @@ class AntiNJClient(discord.Client):
                     setattr(user.users[int(user_i)], reset, config.user_reset_values[reset])
                 user.users[int(user_i)].save()
         global guild
-        guild = client.fetch_guild(925208758370590820)
+        guild = await client.fetch_guild(925208758370590820)
         await self.join_vc()
 
     async def on_message(self, message: discord.Message):
