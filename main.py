@@ -277,6 +277,7 @@ class AntiNJClient(discord.Client):
             await self.join_vc(self)
             return
         if containsNJ(message.content):
+            await message.add_reaction("\N{SHUT}")
             njcount = user.increment_user(message.author.id)
             if njcount % 100 == 0:
                 try:
