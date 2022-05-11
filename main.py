@@ -280,7 +280,7 @@ class AntiNJClient(discord.Client):
             await self.join_vc(self)
             return
         if containsNJ(message.content):
-            await message.add_reaction(get_emoji(guild, "shut"))
+            await message.add_reaction(await get_emoji(guild, "shut"))
             njcount = user.increment_user(message.author.id)
             if njcount % 100 == 0:
                 try:
