@@ -21,6 +21,7 @@ tokenFile.close()
 queue = []
 YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
 FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+save_data = {}
 
 
 # Picks a random filename in a directory
@@ -47,6 +48,10 @@ def randomString(choices: Dict[str, int]) -> str:
 # Returns true if "new jersey" is in the string
 def containsNJ(text: str) -> bool:
     return "newjersey" in text.lower().replace(" ", "")
+
+
+def containsCivE(text: str) -> bool:
+    return "civile" in text.lower().replace(" ", "") or "civil engineering" in text.lower().replace(" ", "")
 
 
 # Returns the index after "I'm" or "Im", or -1 if not found
@@ -292,6 +297,8 @@ class AntiNJClient(discord.Client):
                     await message.reply("Oh, you’re from New Jersey? What exit?")
                 else:
                     await message.reply(randomString(config.newJerseyReplies))
+        if containsCivE(message.content):
+            await message.reply(randomString(config.civilEReplies))
         indexIm = containsIm(message.clean_content)
         if indexIm >= 0:
             if random.randrange(config.chance) == 0:

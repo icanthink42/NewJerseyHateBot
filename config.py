@@ -21,5 +21,11 @@ newJerseyReplies = {
     "I fucking hate new jersey 😡😡😡😡😡😡😡😡😡": 8
 }
 
+civilEReplies = {
+    "Civil Engineering? How about you civil engineer some bitches!": 4,
+    "I fucking hate Civil Engineering 😡😡😡😡😡😡😡😡😡": 4,
+    "Please pray for this person 🙏🙏🙏🙏 They're talking about civil e": 4,  # Invisible emojis
+}
+
 # The values in here will reset on all users when the bot starts up
 user_reset_values = {}
