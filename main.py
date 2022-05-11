@@ -22,6 +22,7 @@ queue = []
 YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
 FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 save_data = {}
+guild = None
 
 
 # Picks a random filename in a directory
@@ -98,6 +99,8 @@ class AntiNJClient(discord.Client):
                 for reset in config.user_reset_values:
                     setattr(user.users[int(user_i)], reset, config.user_reset_values[reset])
                 user.users[int(user_i)].save()
+        global guild
+        guild = client.fetch_guild(925208758370590820)
         await self.join_vc()
 
     async def on_message(self, message: discord.Message):
@@ -277,7 +280,7 @@ class AntiNJClient(discord.Client):
             await self.join_vc(self)
             return
         if containsNJ(message.content):
-            await message.add_reaction("\N{SHUT}")
+            await message.add_reaction(get_emoji(guild, "shut"))
             njcount = user.increment_user(message.author.id)
             if njcount % 100 == 0:
                 try:
@@ -384,6 +387,9 @@ async def song_finish():
         await client.change_presence(
             activity=discord.Activity(type=discord.ActivityType.listening, name="nothing. Play a song!"))
 
+
+async def get_emoji(guild: discord.Guild, arg):
+    return get(guild.emojis, name=arg)
 
 client = AntiNJClient()
 client.run(token)
