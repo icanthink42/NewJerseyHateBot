@@ -381,11 +381,12 @@ async def song_finish():
         pass
     if len(queue) > 0:
         await yt(queue[0]["channel"], queue[0]["url"])
-    elif before_len == 0 and datetime.datetime.today().weekday() == 1:
-        channel = await client.fetch_channel(925208760434192414)
-        await yt(channel, "https://youtu.be/wrdK57qgNqA")
+    else:
         await client.change_presence(
             activity=discord.Activity(type=discord.ActivityType.listening, name="nothing. Play a song!"))
+        if datetime.datetime.today().weekday() == 2:
+            channel = await client.fetch_channel(925208760434192414)
+            await yt(channel, "https://youtu.be/wrdK57qgNqA")
 
 
 async def get_emoji(guild: discord.Guild, arg):
