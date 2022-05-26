@@ -196,7 +196,7 @@ class AntiNJClient(discord.Client):
                 return
         if message.content[0] == ">" or message.content[0] == ")":
             url = message.content[1:]
-            if message.channel.id == 925208760010551335:
+            if message.channel.id == 925208760010551335 and random.randrange(config.music_commands_chance - 1) != 0:
                 await message.reply("I do not play anything in <#925208760010551335>")
                 return
             try:
