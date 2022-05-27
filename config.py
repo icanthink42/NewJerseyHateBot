@@ -12,6 +12,7 @@ prospective_students = 944353239543992330
 moderators = [343545158140428289]
 output_path = "data.txt"
 music_commands_chance = 100
+main_guild = 925208758370590820
 
 # A weighted list of replies when somebody says new jersey in chat
 newJerseyReplies = {

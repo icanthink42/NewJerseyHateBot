@@ -199,6 +199,9 @@ class AntiNJClient(discord.Client):
             if message.channel.id == 925208760010551335 and random.randrange(config.music_commands_chance - 1) != 0:
                 await message.reply("I do not play anything in <#925208760010551335>")
                 return
+            if message.guild.id != config.main_guild:
+                await message.reply("I do not play anything out side of the main RPI Class of 2022 discord server! If you want a music playing bot I would recommend this one: https://fredboat.com/")
+                return
             try:
                 with YoutubeDL(YDL_OPTIONS) as ydl:
                     info = ydl.extract_info(url, download=False)
