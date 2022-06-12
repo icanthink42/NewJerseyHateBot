@@ -107,6 +107,8 @@ class AntiNJClient(discord.Client):
         split_message = message.content.split(" ")
         if message.author.activity.name.lower() == "league of legends":
             await message.reply("Stop playing League of Legends!")
+        if "zach" in message.content.lower():
+            await message.reply("*zak")
         if self.disabled:
             return
         if split_message[0] == "!getdata" and message.author.id:
