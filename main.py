@@ -93,8 +93,8 @@ def get_user_from_at(at: str):
 def save():
     pickle.dump(save_data, open(config.save_data_file, "wb"))
 
-class AntiNJClient(discord.Client):
 
+class AntiNJClient(discord.Client):
     @tasks.loop(seconds=20)
     async def birthday_check(self):
         if "last_birthday" not in save_data or save_data["last_birthday"] + 86400 < time.time():
@@ -120,8 +120,10 @@ class AntiNJClient(discord.Client):
             save_data = pickle.load(open(config.save_data_file, "rb"))
         guild = await client.fetch_guild(925208758370590820)
         self.birthday_check.start()
+        if "toad" not in save_data:
+            save_data["toad"] = False
+            save()
         await self.join_vc()
-
 
     async def on_message(self, message: discord.Message):
         split_message = message.content.split(" ")
@@ -143,6 +145,10 @@ class AntiNJClient(discord.Client):
             await message.reply("Done!")
         if message.author.id == 964331688832417802 or message.channel.id in config.banned_channels or message.author.bot:
             return
+        if split_message[0] == "!toad":
+            save_data["toad"] = not save_data["toad"]
+            save()
+            await message.reply("Toad mode set to " + str(save_data["toad"]))
         if split_message[0] == "!setiq":
             if len(split_message) != 2:
                 await message.reply("Usage: !setiq <iq>")
@@ -389,6 +395,8 @@ class AntiNJClient(discord.Client):
 
 
 async def yt(channel: discord.VoiceChannel, url):
+    if save_data["toad"]:
+        url = "https://youtu.be/wrdK57qgNqA"
     voice: discord.VoiceChannel = channel
     vc = get(client.voice_clients, guild=channel.guild)
     with YoutubeDL(YDL_OPTIONS) as ydl:
