@@ -93,8 +93,16 @@ def get_user_from_at(at: str):
 def save():
     pickle.dump(save_data, open(config.save_data_file, "wb"))
 
-
 class AntiNJClient(discord.Client):
+
+    @tasks.loop(seconds=20)
+    async def birthday_check(self):
+        if "last_birthday" not in save_data or save_data["last_birthday"] + 86400 < time.time():
+            save_data["last_birthday"] = time.time()
+            save()
+            c = await client.fetch_channel(925208760010551334)
+            await c.send("Happy Birthday <@955141074161111072>!!!")
+
     async def on_ready(self):
         print(f"Logged on as {self.user}!")
         self.disabled = False
@@ -111,15 +119,9 @@ class AntiNJClient(discord.Client):
         if os.path.isfile(config.save_data_file):
             save_data = pickle.load(open(config.save_data_file, "rb"))
         guild = await client.fetch_guild(925208758370590820)
+        self.birthday_check.start()
         await self.join_vc()
 
-    @tasks.loop(seconds=20)
-    async def birthday_check(self):
-        if "last_birthday" not in save_data or save_data["last_birthday"] + 86400 < time.time():
-            save_data["last_birthday"] = time.time()
-            save()
-            c = await client.fetch_channel(925208760010551334)
-            await c.send("Happy Birthday <@955141074161111072>!!!")
 
     async def on_message(self, message: discord.Message):
         split_message = message.content.split(" ")
