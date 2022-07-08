@@ -5,6 +5,7 @@ import random
 import pickle
 import time
 
+from discord.ext import tasks
 from discord.utils import get
 
 import user
@@ -68,6 +69,7 @@ def containsIm(text: str) -> int:
     # Not found
     return -1
 
+
 def containsYour(text: str) -> int:
     # "Im"
     index = text.lower().find("youre ")
@@ -80,11 +82,16 @@ def containsYour(text: str) -> int:
     # Not found
     return -1
 
+
 def get_user_from_at(at: str):
     str_id = at.replace("<", "").replace(">", "").replace("@", "")
     int_id = int(str_id)
     if int_id in user.users:
         return user.get_user(int_id)
+
+
+def save():
+    pickle.dump(save_data, open(config.save_data_file, "wb"))
 
 
 class AntiNJClient(discord.Client):
@@ -100,8 +107,19 @@ class AntiNJClient(discord.Client):
                     setattr(user.users[int(user_i)], reset, config.user_reset_values[reset])
                 user.users[int(user_i)].save()
         global guild
+        global save_data
+        if os.path.isfile(config.save_data_file):
+            save_data = pickle.load(open(config.save_data_file, "rb"))
         guild = await client.fetch_guild(925208758370590820)
         await self.join_vc()
+
+    @tasks.loop(seconds=20)
+    async def birthday_check(self):
+        if "last_birthday" not in save_data or save_data["last_birthday"] + 86400 < time.time():
+            save_data["last_birthday"] = time.time()
+            save()
+            c = await client.fetch_channel(925208760010551334)
+            await c.send("Happy Birthday <@955141074161111072>!!!")
 
     async def on_message(self, message: discord.Message):
         split_message = message.content.split(" ")
@@ -113,7 +131,8 @@ class AntiNJClient(discord.Client):
             return
         if split_message[0] == "!getdata" and message.author.id:
             self.disabled = True
-            await message.reply("Getting data... All bot functions have been temporarily disabled to conserve API rate limit!")
+            await message.reply(
+                "Getting data... All bot functions have been temporarily disabled to conserve API rate limit!")
             print("Generating Data...")
             async for message in message.channel.history(limit=1000000):
                 file = open(config.output_path, "a")
@@ -166,7 +185,8 @@ class AntiNJClient(discord.Client):
                 return
             elif get_user_from_at(split_message[1]) is not None:
                 a_user = get_user_from_at(split_message[1])
-                await message.reply("<@" + str(a_user.discord_id) + "> has " + str(a_user.jersey_coins) + " jersey coins!")
+                await message.reply(
+                    "<@" + str(a_user.discord_id) + "> has " + str(a_user.jersey_coins) + " jersey coins!")
                 return
             else:
                 await message.reply("Could not find that user!")
@@ -204,7 +224,8 @@ class AntiNJClient(discord.Client):
                 await message.reply("I do not play anything in <#925208760010551335>")
                 return
             if message.guild.id != config.main_guild:
-                await message.reply("I do not play anything out side of the main RPI Class of 2022 discord server! If you want a music playing bot I would recommend this one: https://fredboat.com/")
+                await message.reply(
+                    "I do not play anything out side of the main RPI Class of 2022 discord server! If you want a music playing bot I would recommend this one: https://fredboat.com/")
                 return
             try:
                 with YoutubeDL(YDL_OPTIONS) as ydl:
@@ -224,7 +245,8 @@ class AntiNJClient(discord.Client):
                 await message.reply("You must be in a voice channel to play music.")
                 return
             if "toby" in message.author.display_name.lower():
-                await message.reply("I'm very sorry but because your name contains \"toby\" you cannot play music. Please contact <@343545158140428289> if this is a mistake!")
+                await message.reply(
+                    "I'm very sorry but because your name contains \"toby\" you cannot play music. Please contact <@343545158140428289> if this is a mistake!")
                 return
             if config.prospective_students in message.author.roles:
                 await message.reply(
@@ -398,6 +420,7 @@ async def song_finish():
 
 async def get_emoji(guild: discord.Guild, arg):
     return get(guild.emojis, name=arg)
+
 
 client = AntiNJClient()
 client.run(token)
