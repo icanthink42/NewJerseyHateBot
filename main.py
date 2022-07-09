@@ -123,6 +123,9 @@ class AntiNJClient(discord.Client):
         if "toad" not in save_data:
             save_data["toad"] = False
             save()
+        if "honky" not in save_data:
+            save_data["honky"] = False
+            save()
         await self.join_vc()
 
     async def on_message(self, message: discord.Message):
