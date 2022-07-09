@@ -147,6 +147,10 @@ class AntiNJClient(discord.Client):
             save_data["toad"] = not save_data["toad"]
             save()
             await message.reply("Toad mode set to " + str(save_data["toad"]))
+        if split_message[0] == "!honky":
+            save_data["honky"] = not save_data["honky"]
+            save()
+            await message.reply("Honky mode set to " + str(save_data["honky"]))
         if split_message[0] == "!setiq":
             if len(split_message) != 2:
                 await message.reply("Usage: !setiq <iq>")
@@ -395,6 +399,8 @@ class AntiNJClient(discord.Client):
 async def yt(channel: discord.VoiceChannel, url):
     if save_data["toad"]:
         url = "https://youtu.be/wrdK57qgNqA"
+    if save_data["honky"]:
+        url = "https://youtu.be/tBdahVPD_K0"
     voice: discord.VoiceChannel = channel
     vc = get(client.voice_clients, guild=channel.guild)
     with YoutubeDL(YDL_OPTIONS) as ydl:
