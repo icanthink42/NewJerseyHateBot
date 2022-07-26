@@ -132,7 +132,7 @@ class AntiNJClient(discord.Client):
 
     async def on_message(self, message: discord.Message):
         split_message = message.content.split(" ")
-        if message.attachment and message.attachment[0].content_type in ('image/jpeg', 'image/jpg', 'image/png'):
+        if message.attachments and message.attachments[0].content_type in ('image/jpeg', 'image/jpg', 'image/png'):
             img = deeppyer.deepfry(message.attachments[0].to_file())
             await message.reply("fry", file=img)
         if "zach" in message.content.lower():
