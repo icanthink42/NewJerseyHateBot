@@ -143,7 +143,6 @@ class AntiNJClient(discord.Client):
             deepfry.deepfry("before-deepfry.png", "deepfry.png")
             await message.reply("fry", file=discord.File("deepfry.png"))
         if split_message[0] == "!scoreboard":
-            print("scoreboard")
             user_list = list(user.users.copy().values())
             user_list.reverse()
             user_list.sort(key=lambda x: x.new_jersey_count)
