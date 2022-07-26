@@ -147,7 +147,8 @@ class AntiNJClient(discord.Client):
             user_list.sort(key=lambda x: x.new_jersey_count)
             out = "**New Jersey scoreboard:**\n"
             for u in user_list:
-                out += "<#" + str(u.discord_id) + ">: " + str(u.new_jersey_count) +"\n"
+                d_user = await client.fetch_user(u.discord_id)
+                out += d_user.display_name + ": " + str(u.new_jersey_count) + "\n"
             await message.reply(out)
         if "zach" in message.content.lower():
             await message.reply("*zak")
