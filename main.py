@@ -4,7 +4,9 @@ import os
 import random
 import pickle
 import time
+from io import BytesIO
 
+from PIL import Image
 from discord.ext import tasks
 from discord.utils import get
 
@@ -16,7 +18,7 @@ import asyncio
 import discord
 from youtube_dl import YoutubeDL
 
-import deeppyer
+from Deepfry import deepfry
 
 tokenFile = open("token", "r")
 token = tokenFile.read()
@@ -133,8 +135,11 @@ class AntiNJClient(discord.Client):
     async def on_message(self, message: discord.Message):
         split_message = message.content.split(" ")
         if message.attachments and message.attachments[0].content_type in ('image/jpeg', 'image/jpg', 'image/png'):
-            img = await deeppyer.deepfry(await message.attachments[0].to_file())
-            await message.reply("fry", file=img)
+            img_bytes = BytesIO(await message.attachments[0].read())
+            img = Image.open(img_bytes)
+            img.save("before-deepfry.png")
+            deepfry.deepfry("before-deepfry.png", "deepfry.png")
+            await message.reply("fry", file=discord.File("deepfry.png"))
         if "zach" in message.content.lower():
             await message.reply("*zak")
         if self.disabled:
