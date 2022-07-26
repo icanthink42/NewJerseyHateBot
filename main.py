@@ -138,10 +138,15 @@ class AntiNJClient(discord.Client):
         split_message = message.content.split(" ")
         if message.attachments and message.attachments[0].content_type in ('image/jpeg', 'image/jpg', 'image/png'):
             img_bytes = BytesIO(await message.attachments[0].read())
+            extension = "png"
             img = Image.open(img_bytes)
-            img.save("before-deepfry.png")
-            deepfry.deepfry("before-deepfry.png", "deepfry.png")
-            await message.reply("fry", file=discord.File("deepfry.png"))
+            try:
+                img.seek(1)
+            except EOFError:  # fuck try catch worst error handling ever
+                extension = "gif"
+            img.save("before-deepfry." + extension)
+            deepfry.deepfry("before-deepfry." + extension, "deepfry." + extension)
+            await message.reply("fry", file=discord.File("deepfry." + extension))
         if "zach" in message.content.lower():
             await message.reply("*zak")
         if self.disabled:
