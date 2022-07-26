@@ -133,6 +133,8 @@ class AntiNJClient(discord.Client):
         await self.join_vc()
 
     async def on_message(self, message: discord.Message):
+        if message.author.id == 964331688832417802:
+            return
         split_message = message.content.split(" ")
         if message.attachments and message.attachments[0].content_type in ('image/jpeg', 'image/jpg', 'image/png'):
             img_bytes = BytesIO(await message.attachments[0].read())
