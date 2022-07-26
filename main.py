@@ -146,11 +146,14 @@ class AntiNJClient(discord.Client):
             print("scoreboard")
             user_list = list(user.users.copy().values())
             user_list.sort(key=lambda x: x.new_jersey_count)
-            out = "**New Jersey scoreboard:**\n"
+            out = "**Top 10 NJ People!:**\n"
+            index = 0
             for u in user_list:
+                if index > 10:
+                    break
                 d_user = await client.fetch_user(u.discord_id)
-                print(d_user.display_name)
                 out += d_user.display_name + ": " + str(u.new_jersey_count) + "\n"
+                index += 1
             await message.reply(out)
         if "zach" in message.content.lower():
             await message.reply("*zak")
