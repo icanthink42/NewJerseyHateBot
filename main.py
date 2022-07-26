@@ -145,6 +145,7 @@ class AntiNJClient(discord.Client):
         if split_message[0] == "!scoreboard":
             print("scoreboard")
             user_list = list(user.users.copy().values())
+            user_list.reverse()
             user_list.sort(key=lambda x: x.new_jersey_count)
             out = "**Top 10 NJ People!:**\n"
             index = 0
