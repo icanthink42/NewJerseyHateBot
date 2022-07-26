@@ -16,6 +16,8 @@ import asyncio
 import discord
 from youtube_dl import YoutubeDL
 
+import deeppyer
+
 tokenFile = open("token", "r")
 token = tokenFile.read()
 tokenFile.close()
@@ -130,6 +132,9 @@ class AntiNJClient(discord.Client):
 
     async def on_message(self, message: discord.Message):
         split_message = message.content.split(" ")
+        if message.attachment and message.attachment[0].content_type in ('image/jpeg', 'image/jpg', 'image/png'):
+            img = deeppyer.deepfry(message.attachments[0].to_file())
+            await message.reply("fry", file=img)
         if "zach" in message.content.lower():
             await message.reply("*zak")
         if self.disabled:
